@@ -107,7 +107,7 @@ DATABASES = {
 #     },
 # ]
 
-# AUTH_USER_MODEL = "users_app.CustomUser"
+AUTH_USER_MODEL = "accounts.CustomUser"
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

@@ -39,5 +39,4 @@ class ShopView(generic.ListView):
         context['materials_list'] = [product.get_material_display for product in Product.objects.all()]
         context['colors_list'] = [product.get_color_display for product in Product.objects.all()]
         context['sizes_list'] = [product.size for product in SizeVariation.objects.distinct('size')]
-        print(context['sizes_list'])
         return context

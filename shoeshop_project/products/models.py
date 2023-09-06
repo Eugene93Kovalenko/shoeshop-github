@@ -63,6 +63,39 @@ class Product(models.Model):
         Cream = "Cream"
         Brown = "Brown"
 
+    GENDER_CHOICES = [
+        ('men', 'Men'),
+        ('women', 'Women'),
+        ('unisex', 'Unisex'),
+    ]
+
+    COLOR_CHOICES = [
+        ('black', 'Black'),
+        ('white', 'White'),
+        ('green', 'Green'),
+        ('yellow', 'Yellow'),
+        ('blue', 'Blue'),
+        ('grey', 'Grey'),
+        ('red', 'Red'),
+        ('cream', 'Cream'),
+        ('brown', 'Brown'),
+        ('orange', 'Orange'),
+        ('multicolor', 'Multicolor'),
+    ]
+
+    MATERIAL_CHOICES = [
+        ('leather', 'Leather'),
+        ('leatherette', 'Leatherette'),
+        ('suede', 'Suede'),
+        ('fabric', 'Fabric'),
+        ('mixed', 'Mixed'),
+    ]
+
+    class GenderChoices(models.TextChoices):
+        Men = 'Men'
+        Women = 'Women'
+        Unisex = 'Unisex'
+
     class MaterialChoices(models.TextChoices):
         Leather = 'Leather'
         Suede = 'Suede'
@@ -75,17 +108,19 @@ class Product(models.Model):
     # image = models.ForeignKey('ProductImage', on_delete=models.CASCADE, null=True)
     # size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name="products")
     # color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name="products")
-    material_choices = models.CharField(max_length=20, choices=MaterialChoices.choices, blank=True)
-    color_choices = models.CharField(
-        max_length=10, choices=ColorChoices.choices, blank=True
-    )
+    # gender_choices = models.CharField(
+    #     max_length=10, choices=GenderChoices.choices, blank=True
+    # )
+    # collection = models.CharField(max_length=10, choices=COLLECTION_CHOICE, blank=True)
+    material = models.CharField(max_length=20, choices=MATERIAL_CHOICES, blank=True)
+    color = models.CharField(max_length=20, choices=COLOR_CHOICES)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     description = models.TextField(blank=False)
     slug = models.SlugField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     num_visits = models.IntegerField(default=0)
-    # collection = models.CharField(max_length=10, choices=COLLECTION_CHOICE, blank=True)
     category = models.ManyToManyField(Category, related_name="products")
 
     def __str__(self):

@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('', include('products.urls', namespace='products')),
-    # path('', include('orders.urls', namespace='orders')),
+    path('', include('orders.urls', namespace='orders')),
 
 ]
 

@@ -33,4 +33,11 @@ class ShopView(generic.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['brands_list'] = [product.brand for product in Product.objects.all()]
+        context['categories_list'] = [product.category for product in Product.objects.all()]
+        context['stiles_list'] = [product.style for product in Product.objects.all()]
+        context['materials_list'] = [product.get_material_display for product in Product.objects.all()]
+        context['colors_list'] = [product.get_color_display for product in Product.objects.all()]
+        context['sizes_list'] = [product.size for product in SizeVariation.objects.distinct('size')]
+        print(context['sizes_list'])
         return context

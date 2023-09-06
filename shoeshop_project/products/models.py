@@ -17,6 +17,17 @@ class Category(models.Model):
         verbose_name_plural = "Категории"
 
 
+class Style(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Стиль"
+        verbose_name_plural = "Стили"
+
+
 class Brand(models.Model):
     name = models.CharField(max_length=50)
 
@@ -114,6 +125,7 @@ class Product(models.Model):
     # collection = models.CharField(max_length=10, choices=COLLECTION_CHOICE, blank=True)
     material = models.CharField(max_length=20, choices=MATERIAL_CHOICES, blank=True)
     color = models.CharField(max_length=20, choices=COLOR_CHOICES)
+    style = models.ForeignKey(Style, on_delete=models.CASCADE, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     description = models.TextField(blank=False)
@@ -121,7 +133,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     num_visits = models.IntegerField(default=0)
-    category = models.ManyToManyField(Category, related_name="products")
+    category = models.ManyToManyField(Category, related_name="products", blank=True)
 
     def __str__(self):
         return self.name
@@ -138,18 +150,17 @@ class Product(models.Model):
         ordering = ["name"]
 
 
-# class ProductSizeColor(models.Model):
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
-#     size = models.ForeignKey(Size, on_delete=models.CASCADE)
-#     color = models.ForeignKey(Color, on_delete=models.CASCADE)
-#     quantity = models.PositiveIntegerField()
-#
-#     class Meta:
-#         verbose_name = "Товар - Размер - Цвет"
-#         verbose_name_plural = "Товар - Размер - Цвет"
-#
-#     def __str__(self):
-#         return f"{self.product} - {self.size} - {self.color}"
+class SizeVariation(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
+    size = models.ForeignKey(Size, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name = "Товар - Размер"
+        verbose_name_plural = "Товар - Размер"
+
+    def __str__(self):
+        return f"{self.product} - {self.size}"
 
 
 class ProductImage(models.Model):

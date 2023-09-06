@@ -124,46 +124,15 @@
             </div>
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <p><a href="#" class="btn btn-primary btn-lg">Shop All Products</a></p>
+                    <p><a href="{% url 'products:shop' %}" class="btn btn-primary btn-lg">Shop All Products</a></p>
                 </div>
             </div>
         </div>
     </div>
     <!--END PRODUCT LIST-->
 
-    <!--PARTNERS-->
-    <div class="colorlib-partner">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-8 offset-sm-2 text-center colorlib-heading colorlib-heading-sm">
-                    <h2>Trusted Partners</h2>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col partner-col text-center">
-                    <img src="{% static 'products/images/brand-1.jpg' %}" class="img-fluid"
-                         alt="Free html4 bootstrap 4 template">
-                </div>
-                <div class="col partner-col text-center">
-                    <img src="{% static 'products/images/brand-2.jpg' %}" class="img-fluid"
-                         alt="Free html4 bootstrap 4 template">
-                </div>
-                <div class="col partner-col text-center">
-                    <img src="{% static 'products/images/brand-3.jpg' %}" class="img-fluid"
-                         alt="Free html4 bootstrap 4 template">
-                </div>
-                <div class="col partner-col text-center">
-                    <img src="{% static 'products/images/brand-4.jpg' %}" class="img-fluid"
-                         alt="Free html4 bootstrap 4 template">
-                </div>
-                <div class="col partner-col text-center">
-                    <img src="{% static 'products/images/brand-5.jpg' %}" class="img-fluid"
-                         alt="Free html4 bootstrap 4 template">
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--END PARTNERS-->
+    {% include 'include/partners.html' %}
+
 </div>
 {% endblock content %}
 

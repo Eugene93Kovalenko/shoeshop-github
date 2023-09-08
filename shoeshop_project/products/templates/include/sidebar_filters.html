@@ -1,0 +1,108 @@
+{% load static %}
+<div class="col-lg-3 col-xl-3">
+    <div class="row">
+        <form method="get">
+            <!--BRAND-->
+            <div class="col-sm-12">
+                <div class="side border mb-1">
+                    <h3>Brand</h3>
+                    {% for brand in brands_list %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{ brand.name }}"
+                               id="brand-1" name="brand"> <a href="https://www.youtube.com/">{{ brand.name }}</a>
+                        <label class="form-check-label" for="brand-1">
+<!--                            {{ brand.name }}-->
+
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!--END BRAND-->
+
+            <!--SIZE-->
+            <div class="col-sm-12">
+                <div class="side border mb-1">
+                    <h3>Size</h3>
+                    <div class="block-26 mb-2">
+                        <ul>
+                            {% for size in sizes_list %}
+                            <li><a href="#">{{ size.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!--END SIZE-->
+
+            <!--CATEGORY-->
+            <div class="col-sm-12">
+                <div class="side border mb-1">
+                    <h3>Category</h3>
+                    <ul>
+                        {% for cat in categories_list %}
+                        <li><a href="#">{{ cat.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <!--END CATEGORY-->
+
+            <!--COLOR-->
+            <div class="col-sm-12">
+                <div class="side border mb-1">
+                    <h3>Colors</h3>
+                    <!--                    <ul>-->
+                    {% for color in colors_list %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{ color.lower }}"
+                               id="color-{{ forloop.counter0 }}" name="color">
+                        <label class="form-check-label" for="color-{{ forloop.counter0 }}">
+                            {{ color }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                    <!--                    </ul>-->
+                </div>
+            </div>
+            <!--END COLOR-->
+
+            <!--MATERIAL-->
+            <div class="col-sm-12">
+                <div class="side border mb-1">
+                    <h3>Material</h3>
+                        {% for material in materials_list %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="{{ material.lower }}"
+                                   id="material-{{ forloop.counter0 }}" name="material">
+                            <label class="form-check-label" for="material-{{ forloop.counter0 }}">
+                                {{ material }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                </div>
+            </div>
+            <!--END MATERIAL-->
+
+            <!--STYLE-->
+            <div class="col-sm-12">
+                <div class="side border mb-1">
+                    <h3>Style</h3>
+                    <ul>
+                        {% for style in stiles_list %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="{{ style.id }}"
+                                   id="style-{{ forloop.counter0 }}" name="style">
+                            <label class="form-check-label" for="style-{{ forloop.counter0 }}">
+                                {{ style.name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <!--END STYLE-->
+            <button class="block-26 mb-2 side border mb-1 ">Submit</button>
+        </form>
+    </div>
+</div>

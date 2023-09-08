@@ -139,7 +139,7 @@ class Product(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("products:product", kwargs={"product_slug": self.slug})
+        return reverse("products:product-detail", kwargs={"product_slug": self.slug})
 
     # def get_collection_absolute_url(self):
     #     return reverse("product_app:collection", kwargs={"collection_name": self.collection})

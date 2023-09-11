@@ -32,9 +32,10 @@
                         </li>
                         <li><a href="women.html">Men</a></li>
                         <li><a href="women.html">Women</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                        <li class="cart"><a href="cart.html"><i class="icon-shopping-cart"></i> Cart [0]</a></li>
+                        <li><a href="{% url 'products:about' %}">About</a></li>
+                        <li><a href="{% url 'products:contact' %}">Contact</a></li>
+                        <li class="cart"><a href="{% url 'orders:cart' %}"><i class="icon-shopping-cart"></i> Cart
+                            [0]</a></li>
                         {% if user.is_authenticated %}
                         <li class="cart"><a href="">Sign Out</a></li>
                         {% else %}

@@ -26,7 +26,7 @@ class ShopView(generic.ListView):
     paginate_by = 2
 
     def get_filters(self):
-        brand_q, color_q, material_q = Q(), Q(), Q()
+        brand_q, color_q, material_q, size_q = Q(), Q(), Q(), Q()
 
         for brand in self.request.GET.getlist('brand'):
             if brand:
@@ -40,20 +40,24 @@ class ShopView(generic.ListView):
             if color:
                 color_q |= Q(color=color)
 
-        return brand_q & color_q & material_q
+        for size in self.request.GET.getlist('size'):
+            if size:
+                size_q |= Q(size=size)
+
+        return brand_q & color_q & material_q & size_q
 
     def get_queryset(self):
+        self.request.GET.getlist('color')
         return Product.objects.filter(self.get_filters())
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['brands_list'] = [product.brand for product in Product.objects.all()]
-        context['categories_list'] = [product.category for product in Product.objects.all()]
-        context['stiles_list'] = [product.style for product in Product.objects.all()]
-        context['materials_list'] = [product.get_material_display for product in Product.objects.all()]
-        context['colors_list'] = [product.get_color_display for product in Product.objects.all()]
-        print(context['colors_list'])
+        context['brands_list'] = set([product.brand for product in Product.objects.all()])
         context['sizes_list'] = [product.size for product in SizeVariation.objects.distinct('size')]
+        context['categories_list'] = [product.category for product in Product.objects.all()]
+        context['colors_list'] = set([product.get_color_display for product in Product.objects.all()])
+        context['materials_list'] = set([product.get_material_display for product in Product.objects.all()])
+        context['stiles_list'] = set([product.style for product in Product.objects.all()])
         return context
 
 
@@ -69,6 +73,14 @@ class ProductDetailView(generic.DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context["product_images"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
-        # context["product_images"] = ProductImage.objects.filter(product__slug='women_boots')
-
+        context['sizes_list'] = [product.size for product in SizeVariation.objects.distinct('size')]
         return context
+
+
+class AboutView(generic.TemplateView):
+    template_name = "products/about.html"
+
+
+class ContactView(generic.TemplateView):
+    template_name = "products/contact.html"
+

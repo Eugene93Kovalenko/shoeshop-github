@@ -62,17 +62,28 @@ class Size(models.Model):
 
 
 class Product(models.Model):
-    class ColorChoices(models.TextChoices):
-        Black = "Black"
-        Red = "Red"
-        White = "White"
-        Yellow = "Yellow"
-        Blue = "Blue"
-        Green = "Green"
-        Grey = "Grey"
-        Orange = "Orange"
-        Cream = "Cream"
-        Brown = "Brown"
+    # class ColorChoices(models.TextChoices):
+    #     Black = "Black"
+    #     Red = "Red"
+    #     White = "White"
+    #     Yellow = "Yellow"
+    #     Blue = "Blue"
+    #     Green = "Green"
+    #     Grey = "Grey"
+    #     Orange = "Orange"
+    #     Cream = "Cream"
+    #     Brown = "Brown"
+
+    # class GenderChoices(models.TextChoices):
+    #     Men = 'Men'
+    #     Women = 'Women'
+    #     Unisex = 'Unisex'
+    #
+    # class MaterialChoices(models.TextChoices):
+    #     Leather = 'Leather'
+    #     Suede = 'Suede'
+    #     Canvas = 'Canvas'
+    #     Mixed = 'Mixed'
 
     GENDER_CHOICES = [
         ('men', 'Men'),
@@ -101,17 +112,6 @@ class Product(models.Model):
         ('fabric', 'Fabric'),
         ('mixed', 'Mixed'),
     ]
-
-    class GenderChoices(models.TextChoices):
-        Men = 'Men'
-        Women = 'Women'
-        Unisex = 'Unisex'
-
-    class MaterialChoices(models.TextChoices):
-        Leather = 'Leather'
-        Suede = 'Suede'
-        Canvas = 'Canvas'
-        Mixed = 'Mixed'
 
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=7, decimal_places=2)

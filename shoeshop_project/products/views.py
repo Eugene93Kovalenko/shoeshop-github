@@ -12,7 +12,7 @@ class HomeView(generic.ListView):
     context_object_name = "products"
 
     def get_queryset(self):
-        return Product.objects.all()[:4]
+        return Product.objects.all()[:16]
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -47,17 +47,21 @@ class ShopView(generic.ListView):
         return brand_q & color_q & material_q & size_q
 
     def get_queryset(self):
-        self.request.GET.getlist('color')
         return Product.objects.filter(self.get_filters())
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['brands_list'] = set([product.brand for product in Product.objects.all()])
-        context['sizes_list'] = [product.size for product in SizeVariation.objects.distinct('size')]
-        context['categories_list'] = [product.category for product in Product.objects.all()]
-        context['colors_list'] = set([product.get_color_display for product in Product.objects.all()])
-        context['materials_list'] = set([product.get_material_display for product in Product.objects.all()])
-        context['stiles_list'] = set([product.style for product in Product.objects.all()])
+        # context['brands_list'] = set([product.brand for product in Product.objects.all()])
+        context['brands_list'] = Brand.objects.all()
+        # context['sizes_list'] = [product.size for product in SizeVariation.objects.distinct('size')]
+        context['sizes_list'] = Size.objects.all()
+        # context['categories_list'] = [product.category for product in Product.objects.all()]
+        context['categories_list'] = Category.objects.all()
+        # context['colors_list'] = set([product.get_color_display for product in Product.objects.all()])
+        context['colors_list'] = Color.objects.all()
+        # context['materials_list'] = set([product.get_material_display for product in Product.objects.all()])
+        context['materials_list'] = Material.objects.all()
+        context['stiles_list'] = Style.objects.all()
         return context
 
 

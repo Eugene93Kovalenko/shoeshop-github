@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="colorlib-loader"></div>
+
+<div id="page">
+    {% include 'include/breadcrumbs.html' %}
+
+    <div class="col-4">
+        <h1>Sign Up</h1>
+        <hr>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+        <button class="block-26 mb-2 side border mb-1">Submit</button>
+        </form>
+    </div>
+
+</div>
+{% endblock content %}

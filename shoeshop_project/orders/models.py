@@ -4,29 +4,29 @@ from config import settings
 from products.models import Product
 
 
-class OrderItem(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
-    # order = models.ForeignKey('Order', )
-    ordered = models.BooleanField(default=False)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.quantity} of {self.product.name}"
-
-    def get_total_item_price(self):
-        return self.quantity * self.product.price
-
-    def get_total_discount_item_price(self):
-
-        return self.quantity * self.product.discount_price
-
-    def get_final_price(self):
-        if self.product.discount_price:
-            return self.get_total_discount_item_price()
-        return self.get_total_item_price()
+# class OrderItem(models.Model):
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL,
+#                              on_delete=models.CASCADE)
+#     # order = models.ForeignKey('Order', )
+#     ordered = models.BooleanField(default=False)
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     quantity = models.PositiveIntegerField(default=1)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#
+#     def __str__(self):
+#         return f"{self.quantity} of {self.product.name}"
+#
+#     def get_total_item_price(self):
+#         return self.quantity * self.product.price
+#
+#     def get_total_discount_item_price(self):
+#
+#         return self.quantity * self.product.discount_price
+#
+#     def get_final_price(self):
+#         if self.product.discount_price:
+#             return self.get_total_discount_item_price()
+#         return self.get_total_item_price()
 #
 #
 # class Order(models.Model):

@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.urls import reverse
 
@@ -15,6 +16,18 @@ class Category(models.Model):
     class Meta:
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
+
+
+class Gender(models.Model):
+    name = models.CharField(max_length=30)
+    image = models.ImageField(blank=True, upload_to="gender/%Y/%m/%d/")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Гендер"
+        verbose_name_plural = "Гендеры"
 
 
 class Style(models.Model):
@@ -61,6 +74,17 @@ class Size(models.Model):
         verbose_name_plural = "Размеры"
 
 
+class Material(models.Model):
+    name = models.CharField(max_length=40)
+
+    def __str__(self):
+        return str(self.name)
+
+    class Meta:
+        verbose_name = "Материал"
+        verbose_name_plural = "Материалы"
+
+
 class Product(models.Model):
     # class ColorChoices(models.TextChoices):
     #     Black = "Black"
@@ -85,48 +109,41 @@ class Product(models.Model):
     #     Canvas = 'Canvas'
     #     Mixed = 'Mixed'
 
-    GENDER_CHOICES = [
-        ('men', 'Men'),
-        ('women', 'Women'),
-        ('unisex', 'Unisex'),
-    ]
+    # GENDER_CHOICES = [
+    #     ('men', 'Men'),
+    #     ('women', 'Women'),
+    #     ('unisex', 'Unisex'),
+    # ]
 
-    COLOR_CHOICES = [
-        ('black', 'Black'),
-        ('white', 'White'),
-        ('green', 'Green'),
-        ('yellow', 'Yellow'),
-        ('blue', 'Blue'),
-        ('grey', 'Grey'),
-        ('red', 'Red'),
-        ('cream', 'Cream'),
-        ('brown', 'Brown'),
-        ('orange', 'Orange'),
-        ('multicolor', 'Multicolor'),
-    ]
+    # COLOR_CHOICES = [
+    #     ('black', 'Black'),
+    #     ('white', 'White'),
+    #     ('green', 'Green'),
+    #     ('yellow', 'Yellow'),
+    #     ('blue', 'Blue'),
+    #     ('grey', 'Grey'),
+    #     ('red', 'Red'),
+    #     ('cream', 'Cream'),
+    #     ('brown', 'Brown'),
+    #     ('orange', 'Orange'),
+    #     ('multicolor', 'Multicolor'),
+    # ]
 
-    MATERIAL_CHOICES = [
-        ('leather', 'Leather'),
-        ('leatherette', 'Leatherette'),
-        ('suede', 'Suede'),
-        ('fabric', 'Fabric'),
-        ('mixed', 'Mixed'),
-    ]
+    # MATERIAL_CHOICES = [
+    #     ('leather', 'Leather'),
+    #     ('leatherette', 'Leatherette'),
+    #     ('suede', 'Suede'),
+    #     ('fabric', 'Fabric'),
+    #     ('mixed', 'Mixed'),
+    # ]
 
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     discount_price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    # image = models.ForeignKey('ProductImage', on_delete=models.CASCADE, null=True)
-    # size = models.ForeignKey(Size, on_delete=models.CASCADE, related_name="products")
-    # color = models.ForeignKey(Color, on_delete=models.CASCADE, related_name="products")
-    # gender_choices = models.CharField(
-    #     max_length=10, choices=GenderChoices.choices, blank=True
-    # )
-    # collection = models.CharField(max_length=10, choices=COLLECTION_CHOICE, blank=True)
-    material = models.CharField(max_length=20, choices=MATERIAL_CHOICES, blank=True)
-    color = models.CharField(max_length=20, choices=COLOR_CHOICES)
+    material = models.ForeignKey(Material, on_delete=models.CASCADE, blank=True)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE)
     style = models.ForeignKey(Style, on_delete=models.CASCADE, blank=True, null=True)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     description = models.TextField(blank=False)
     slug = models.SlugField(unique=True)
@@ -150,7 +167,7 @@ class Product(models.Model):
         ordering = ["name"]
 
 
-class SizeVariation(models.Model):
+class ProductVariation(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
@@ -178,3 +195,18 @@ class ProductImage(models.Model):
 
     def get_absolute_url(self):
         return self.image.url
+
+
+
+# class ProductOption(models.Model):
+#     product_id = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="options")
+#     name = models.CharField(max_length=255)
+#     values = ArrayField(base_field=models.CharField(max_length=10))
+#
+#
+# class ProductVariant(models.Model):
+#     product_id = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="variants")
+#     option = models.JSONField()  # Example: {"color": "red", "size": "xl"}
+#     price = models.DecimalField(max_digits=10, decimal_places=2)
+#     quantity = models.PositiveIntegerField()
+#     available = models.BooleanField(default=True)

@@ -14,21 +14,20 @@ class CartView(generic.ListView):
     #     OrderItem.objects.create(user=self.request.user, product_variation=)
 
     def get_queryset(self):
-        print(self.request.GET.get('product-size'))
-        print(self.request.GET.get('quantity'))
         return OrderItem.objects.filter()
 
 
-def get_product_variation_size(request, slug):
-    print('-------------')
-    size = request.GET.get('product-size')
-    return reverse("orders:add-to-cart", kwargs={"slug": slug, "size": size})
+# def get_product_variation_size(request, slug):
+#     print('-------------')
+#     size = request.GET.get('product-size')
+#     print(size)
+#     return reverse("orders:add-to-cart", kwargs={"slug": slug, "size": size})
 
 
-def add_to_cart(request, slug, size):    ######
+def add_to_cart(request, slug):    ######
     print('++++++++++++++++++')
-    # size = request.GET.get('product-size')
-    # print(size)
+    size = request.GET.get('product-size')
+    print(size)
     product_variation = get_object_or_404(ProductVariation, product__slug=slug, size__name=size)    #######
     order_item, created = OrderItem.objects.get_or_create(
         user=request.user,

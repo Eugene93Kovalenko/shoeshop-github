@@ -165,9 +165,13 @@ class Product(models.Model):
     #     # return reverse("products:add_to_cart", kwargs={"product_slug": self.product.slug, "size": self.size.name})
     #     return reverse("orders:add-to-cart", kwargs={"slug": self.slug, "size": self.size.name})
 
-    def get_size(self):
-        print('oooooooooooooooo')
-        return reverse("orders:get-size", kwargs={"slug": self.slug})
+    # def get_size(self):
+    #     print('oooooooooooooooo')
+    #     return reverse("orders:get-size", kwargs={"slug": self.slug})
+
+    def get_add_to_cart_url(self):
+        # return reverse("products:add_to_cart", kwargs={"product_slug": self.product.slug, "size": self.size.name})
+        return reverse("orders:add-to-cart", kwargs={"slug": self.slug})
 
     class Meta:
         verbose_name = "Товар"

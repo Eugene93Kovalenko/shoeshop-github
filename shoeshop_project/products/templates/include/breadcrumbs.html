@@ -1,10 +1,14 @@
 {% load static %}
-<div class="breadcrumbs">
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <p class="bread"><span><a href="{% url 'products:shop' %}">Home</a></span> / <span>Women</span></p>
+{% load custom_tags %}
+{% if request.path != '/' %}
+    <div class="breadcrumbs">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <p class="bread"><span><a href="{% url 'products:home' %}">Home</a></span> /
+                        <span>{% get_path_for_breadcrumbs request.path %}</span></p>
+                </div>
             </div>
         </div>
     </div>
-</div>
+{% endif %}

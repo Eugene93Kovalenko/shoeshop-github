@@ -40,6 +40,8 @@
                                 <input type="checkbox" name="size" value="{{ size.lower }}">
                                 <span>{{ size.name }}</span>
                             </label>
+<!--                            <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off">-->
+<!--                            <label class="btn btn-secondary" for="option2">{{ size.name }}</label>-->
                             {% endfor %}
                         </ul>
                     </div>
@@ -67,7 +69,7 @@
                     <!--                    <ul>-->
                     {% for color in colors_list %}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="{{ color.lower }}"
+                        <input class="form-check-input" type="checkbox" value="{{ color }}"
                                id="color-{{ forloop.counter0 }}" name="color">
                         <label class="form-check-label" for="color-{{ forloop.counter0 }}">
                             {{ color }}
@@ -85,7 +87,7 @@
                     <h3>Material</h3>
                         {% for material in materials_list %}
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="{{ material.lower }}"
+                            <input class="form-check-input" type="checkbox" value="{{ material }}"
                                    id="material-{{ forloop.counter0 }}" name="material">
                             <label class="form-check-label" for="material-{{ forloop.counter0 }}">
                                 {{ material }}

@@ -176,6 +176,7 @@ class ProductVariation(models.Model):
     quantity = models.PositiveIntegerField()
 
     class Meta:
+        unique_together = ('product', 'size')
         verbose_name = "Товар - Размер"
         verbose_name_plural = "Товар - Размер"
 
@@ -201,18 +202,3 @@ class ProductImage(models.Model):
 
     def get_absolute_url(self):
         return self.image.url
-
-
-
-# class ProductOption(models.Model):
-#     product_id = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="options")
-#     name = models.CharField(max_length=255)
-#     values = ArrayField(base_field=models.CharField(max_length=10))
-#
-#
-# class ProductVariant(models.Model):
-#     product_id = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="variants")
-#     option = models.JSONField()  # Example: {"color": "red", "size": "xl"}
-#     price = models.DecimalField(max_digits=10, decimal_places=2)
-#     quantity = models.PositiveIntegerField()
-#     available = models.BooleanField(default=True)

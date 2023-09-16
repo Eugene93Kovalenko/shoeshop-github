@@ -35,9 +35,14 @@
                                 </a>
                                 <div class="desc">
                                     <h2><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
-                                    <span class="price">${{ product.price }}</span>
+<!--                                    <span class="price">${{ product.price }}</span>-->
+<!--                                    {% if product.discount_price %}-->
+<!--                                    <span class="price">${{ product.discount_price }}</span>-->
+<!--                                    {% endif %}-->
                                     {% if product.discount_price %}
-                                    <span class="price">${{ product.discount_price }}</span>
+                                    <h6>${{ product.discount_price }} <del class="text-muted ml-2">${{ product.price }}</del></h6>
+                                    {% else %}
+                                    <h6>${{ product.price }}</h6>
                                     {% endif %}
                                 </div>
                             </div>

@@ -79,8 +79,9 @@ class ProductDetailView(generic.DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context["product_images"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
-        context['sizes_per_product_list'] = [product.size for product in ProductVariation.objects.distinct('size')]
-        context['product_variation'] = ProductVariation.objects.filter(product__slug=self.kwargs["product_slug"])[0]
+        context['sizes_per_product_list'] = [product.size for product in ProductVariation.objects.filter(
+            product__slug=self.kwargs["product_slug"])]
+        # context['product_variation'] = ProductVariation.objects.filter(product__slug=self.kwargs["product_slug"])[0]
         # context['s'] = self.request.session.get('cart')
         # print(context['s'])
         # print(context['product_variation'])
@@ -93,37 +94,3 @@ class AboutView(generic.TemplateView):
 
 class ContactView(generic.TemplateView):
     template_name = "products/contact.html"
-
-
-# @login_required
-def add_to_cart(request, s, size):
-    print('---------------')
-    product_variation = get_object_or_404(ProductVariation, product__slug=s, size__name=size)
-    order_item, created = OrderItem.objects.get_or_create(
-        user=request.user,
-        product_variation=product_variation,
-    )
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
-    if order_qs.exists():
-        order = order_qs[0]
-        # check if the order item is in the order
-        if order.products.filter(product__slug=product_variation.slug).exists():
-            order_item.quantity += 1
-            order_item.save()
-            # messages.info(request, "This item quantity was updated.")
-            return redirect("orders:cart")
-        else:
-            order.products.add(order_item)
-            # messages.info(request, "This item was added to your cart.")
-            return redirect("orders:cart")
-    else:
-        # ordered_date = timezone.now()
-        order = Order.objects.create(
-            user=request.user, ordered_date=timezone.now())
-        order.products.add(order_item)
-        # messages.info(request, "This item was added to your cart.")
-        return redirect("orders:cart")
-
-
-
-

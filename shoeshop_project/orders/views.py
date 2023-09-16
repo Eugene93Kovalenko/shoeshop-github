@@ -16,7 +16,8 @@ class CartView(generic.ListView):
     def get_total_discount(self):
         total_discount = 0
         for item in self.get_queryset():
-            total_discount += item.product_variation.product.price * item.quantity - item.product_variation.product.discount_price * item.quantity
+            if item.product_variation.product.discount_price:
+                total_discount += item.product_variation.product.price * item.quantity - item.product_variation.product.discount_price * item.quantity
         return total_discount
 
     def get_total_all_products_price(self):
@@ -29,10 +30,11 @@ class CartView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context["get_total_discount"] = self.get_total_discount()
         context["get_total_all_products_price"] = self.get_total_all_products_price()
-        context["delivery_price"] = Order.objects.filter(user=self.request.user)[0].delivery_price
+        if OrderItem.objects.filter(user=self.request.user, ordered=False):
+            context["delivery_price"] = Order.objects.filter(user=self.request.user, ordered=False)[0].delivery_price
+        else:
+            context["delivery_price"] = 0.00
         context["get_final_order_products_price"] = context["get_total_all_products_price"] + context["delivery_price"]
-        # context["product_slug"] = self.get_queryset().
-        # context["product_image"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
         return context
 
 
@@ -42,26 +44,27 @@ def add_to_cart(request, slug):
     quantity = int(request.GET.get('quantity'))
     # проверить строчку ниже quantity
     product_variation = get_object_or_404(ProductVariation, product__slug=slug, size__name=size)
-    order_item, created = OrderItem.objects.get_or_create(
+    if product_variation.quantity < quantity:
+        raise ValueError('На складе нет этого товара в таком количестве')
+    order_item, created = OrderItem.objects.get_or_create(          # понять строчку
         user=request.user,
         product_variation=product_variation
     )
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
-    if order_qs.exists():
-        order = order_qs[0]
-        # check if the order item is in the order
-        if order.products.filter(product_variation__product__slug=product_variation.product.slug).exists():
+    # находим незавершенные заказы этого юзра
+    order = Order.objects.filter(user=request.user, ordered=False)
+    if order.exists():
+        order = order[0]
+        # проверяет, есть ли в заказе добавляемый товар
+        if order.products.filter(product_variation__product__slug=product_variation.product.slug,
+                                 product_variation__size=size).exists():
             order_item.quantity += quantity
             order_item.save()
-            # messages.info(request, "This item quantity was updated.")
             return redirect("orders:cart")
         else:
             order.products.add(order_item)
-            # messages.info(request, "This item was added to your cart.")
             return redirect("orders:cart")
     else:
         order = Order.objects.create(
             user=request.user, ordered_date=timezone.now())
         order.products.add(order_item)
-        # messages.info(request, "This item was added to your cart.")
         return redirect("orders:cart")

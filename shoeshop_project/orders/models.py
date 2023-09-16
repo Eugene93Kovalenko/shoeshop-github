@@ -13,7 +13,8 @@ class OrderItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.quantity} of {self.product_variation.product.name} by {self.user}"
+        return f"{self.quantity} pcs | {self.product_variation.product.name} | {self.product_variation.size} size |" \
+               f" {self.user}"
 
     def get_total_product_price(self):
         if self.product_variation.product.discount_price:

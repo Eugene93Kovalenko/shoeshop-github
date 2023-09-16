@@ -25,6 +25,7 @@ class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
     products = models.ManyToManyField(OrderItem)
+    delivery_price = models.DecimalField(default=50, max_digits=7, decimal_places=2)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
@@ -41,8 +42,8 @@ class Order(models.Model):
     # refund_requested = models.BooleanField(default=False)
     # refund_granted = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.user
+    # def __str__(self):
+    #     return self.user
 
     def get_total(self):
         total = 0

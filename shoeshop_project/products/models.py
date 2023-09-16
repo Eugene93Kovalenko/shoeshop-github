@@ -161,16 +161,7 @@ class Product(models.Model):
     # def get_collection_absolute_url(self):
     #     return reverse("product_app:collection", kwargs={"collection_name": self.collection})
 
-    # def get_add_to_cart_url(self):
-    #     # return reverse("products:add_to_cart", kwargs={"product_slug": self.product.slug, "size": self.size.name})
-    #     return reverse("orders:add-to-cart", kwargs={"slug": self.slug, "size": self.size.name})
-
-    # def get_size(self):
-    #     print('oooooooooooooooo')
-    #     return reverse("orders:get-size", kwargs={"slug": self.slug})
-
     def get_add_to_cart_url(self):
-        # return reverse("products:add_to_cart", kwargs={"product_slug": self.product.slug, "size": self.size.name})
         return reverse("orders:add-to-cart", kwargs={"slug": self.slug})
 
     class Meta:
@@ -189,10 +180,9 @@ class ProductVariation(models.Model):
         verbose_name_plural = "Товар - Размер"
 
     def __str__(self):
-        return f"{self.product} - {self.size}"
+        return f"{self.product} / {self.size} size"
 
     def get_add_to_cart_url(self):
-        # return reverse("products:add_to_cart", kwargs={"product_slug": self.product.slug, "size": self.size.name})
         return reverse("orders:add-to-cart", kwargs={"slug": self.product.slug, "size": self.size.name})
 
 

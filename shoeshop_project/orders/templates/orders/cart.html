@@ -50,7 +50,7 @@
                     <h1 class="text-center text-muted">You haven't added items to your cart yet</h1>
                     {% else %}
                     {% for item in cart_items %}
-                    <form action="{{ product.remove_from_cart_url }}" method="get">
+<!--                    <form action="{{ product.get_remove_from_cart_url }}" method="get">-->
                     <div class="product-cart d-flex">
                         <div class="one-forth">
                             <div class="product-img">
@@ -84,13 +84,16 @@
                                 <span class="price">${{ item.get_total_product_price }}</span>
                             </div>
                         </div>
+                        <form action="{{ item.get_remove_from_cart_url }}" method="get">
+                        <input type="hidden" name="size" value="{{ item.product_variation.size }}">
                         <div class="one-eight text-center">
                             <div class="display-tc">
                                 <button href="" class="closed"></button>
                             </div>
                         </div>
+                        </form>
                     </div>
-                    </form>
+<!--                    </form>-->
                     {% endfor %}
                     {% endif %}
                 </div>

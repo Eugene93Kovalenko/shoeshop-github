@@ -21,6 +21,9 @@ class OrderItem(models.Model):
             return self.quantity * self.product_variation.product.discount_price
         return self.quantity * self.product_variation.product.price
 
+    def get_remove_from_cart_url(self):
+        return reverse("orders:remove-from-cart", kwargs={"slug": self.product_variation.product.slug})
+
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,

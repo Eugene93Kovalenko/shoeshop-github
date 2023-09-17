@@ -110,7 +110,7 @@ class Product(models.Model):
     def get_add_to_cart_url(self):
         return reverse("orders:add-to-cart", kwargs={"slug": self.slug})
 
-    def remove_from_cart_url(self):
+    def get_remove_from_cart_url(self):
         return reverse("orders:remove-from-cart", kwargs={"slug": self.slug})
 
     class Meta:
@@ -131,6 +131,9 @@ class ProductVariation(models.Model):
 
     def __str__(self):
         return f"{self.product} / {self.size} size"
+
+    # def get_absolute_url(self):
+    #     return reverse("products:product-detail", kwargs={"product_slug": self.product.slug})
 
     # def get_add_to_cart_url(self):
     #     return reverse("orders:add-to-cart", kwargs={"slug": self.product.slug})

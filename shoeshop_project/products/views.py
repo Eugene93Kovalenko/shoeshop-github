@@ -75,15 +75,14 @@ class ProductDetailView(generic.DetailView):
     context_object_name = "product"
     slug_url_kwarg = "product_slug"
 
+    # def get_queryset(self):
+    #     return ProductVariation.objects.filter(product__slug=self.kwargs["product_slug"])
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context["product_images"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
         context['sizes_per_product_list'] = [product.size for product in ProductVariation.objects.filter(
             product__slug=self.kwargs["product_slug"])]
-        # context['product_variation'] = ProductVariation.objects.filter(product__slug=self.kwargs["product_slug"])[0]
-        # context['s'] = self.request.session.get('cart')
-        # print(context['s'])
-        # print(context['product_variation'])
         return context
 
 

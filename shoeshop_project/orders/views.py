@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views import generic
@@ -39,32 +40,66 @@ class CartView(generic.ListView):
 
 
 def add_to_cart(request, slug):
-    print('++++++++++++++++++')
-    size = request.GET.get('product-size')
+    if request.GET.get('quantity') == '0':
+        return redirect(request.META.get('HTTP_REFERER'))
     quantity = int(request.GET.get('quantity'))
-    # проверить строчку ниже quantity
+    size = request.GET.get('product-size')
     product_variation = get_object_or_404(ProductVariation, product__slug=slug, size__name=size)
     if product_variation.quantity < quantity:
         raise ValueError('На складе нет этого товара в таком количестве')
-    order_item, created = OrderItem.objects.get_or_create(          # понять строчку
+    order_item, created = OrderItem.objects.get_or_create(
         user=request.user,
         product_variation=product_variation
     )
-    # находим незавершенные заказы этого юзера
-    order = Order.objects.filter(user=request.user, ordered=False)
-    if order.exists():
-        order = order[0]
-        # проверяет, есть ли в заказе добавляемый товар
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
         if order.products.filter(product_variation__product__slug=slug,
                                  product_variation__size__name=size).exists():
+            # product_variation.quantity -= quantity
+            # product_variation.save()
             order_item.quantity += quantity
             order_item.save()
+            # messages.info(request, "This item quantity was added.")
             return redirect("orders:cart")
         else:
+            # product_variation.quantity -= quantity
+            # product_variation.save()
             order.products.add(order_item)
             return redirect("orders:cart")
     else:
         order = Order.objects.create(
             user=request.user, ordered_date=timezone.now())
+        # product_variation.quantity -= quantity
+        # product_variation.save()
         order.products.add(order_item)
         return redirect("orders:cart")
+
+
+def remove_from_cart(request, slug):
+    print('++++++')
+    print(request.GET.get('product-size'))
+    # product_variation = get_object_or_404(ProductVariation, product__slug=slug)
+    # order_qs = Order.objects.filter(
+    #     user=request.user,
+    #     ordered=False
+    # )
+    # if order_qs.exists():
+    #     order = order_qs[0]
+    #     # check if the order item is in the order
+    #     if order.items.filter(item__slug=item.slug).exists():
+    #         order_item = OrderItem.objects.filter(
+    #             item=item,
+    #             user=request.user,
+    #             ordered=False
+    #         )[0]
+    #         order.items.remove(order_item)
+    #         order_item.delete()
+    #         messages.info(request, "This item was removed from your cart.")
+    #         return redirect("core:order-summary")
+    #     else:
+    #         messages.info(request, "This item was not in your cart")
+    #         return redirect("core:product", slug=slug)
+    # else:
+    #     messages.info(request, "You do not have an active order")
+    #     return redirect("core:product", slug=slug)

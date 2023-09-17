@@ -51,7 +51,6 @@ class ShopView(generic.ListView):
         return brand_q & color_q & material_q & size_q
 
     def get_queryset(self):
-        print(self.request.GET.get('color'))
         return Product.objects.filter(self.get_filters())
 
     def get_context_data(self, *, object_list=None, **kwargs):

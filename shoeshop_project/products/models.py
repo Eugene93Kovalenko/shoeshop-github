@@ -86,57 +86,6 @@ class Material(models.Model):
 
 
 class Product(models.Model):
-    # class ColorChoices(models.TextChoices):
-    #     Black = "Black"
-    #     Red = "Red"
-    #     White = "White"
-    #     Yellow = "Yellow"
-    #     Blue = "Blue"
-    #     Green = "Green"
-    #     Grey = "Grey"
-    #     Orange = "Orange"
-    #     Cream = "Cream"
-    #     Brown = "Brown"
-
-    # class GenderChoices(models.TextChoices):
-    #     Men = 'Men'
-    #     Women = 'Women'
-    #     Unisex = 'Unisex'
-    #
-    # class MaterialChoices(models.TextChoices):
-    #     Leather = 'Leather'
-    #     Suede = 'Suede'
-    #     Canvas = 'Canvas'
-    #     Mixed = 'Mixed'
-
-    # GENDER_CHOICES = [
-    #     ('men', 'Men'),
-    #     ('women', 'Women'),
-    #     ('unisex', 'Unisex'),
-    # ]
-
-    # COLOR_CHOICES = [
-    #     ('black', 'Black'),
-    #     ('white', 'White'),
-    #     ('green', 'Green'),
-    #     ('yellow', 'Yellow'),
-    #     ('blue', 'Blue'),
-    #     ('grey', 'Grey'),
-    #     ('red', 'Red'),
-    #     ('cream', 'Cream'),
-    #     ('brown', 'Brown'),
-    #     ('orange', 'Orange'),
-    #     ('multicolor', 'Multicolor'),
-    # ]
-
-    # MATERIAL_CHOICES = [
-    #     ('leather', 'Leather'),
-    #     ('leatherette', 'Leatherette'),
-    #     ('suede', 'Suede'),
-    #     ('fabric', 'Fabric'),
-    #     ('mixed', 'Mixed'),
-    # ]
-
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     discount_price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
@@ -161,6 +110,9 @@ class Product(models.Model):
     def get_add_to_cart_url(self):
         return reverse("orders:add-to-cart", kwargs={"slug": self.slug})
 
+    def remove_from_cart_url(self):
+        return reverse("orders:remove-from-cart", kwargs={"slug": self.slug})
+
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
@@ -168,20 +120,20 @@ class Product(models.Model):
 
 
 class ProductVariation(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_variation')
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
 
     class Meta:
         unique_together = ('product', 'size')
-        verbose_name = "Товар - Размер"
-        verbose_name_plural = "Товар - Размер"
+        verbose_name = "Товар | Размер"
+        verbose_name_plural = "Товар | Размер"
 
     def __str__(self):
         return f"{self.product} / {self.size} size"
 
-    def get_add_to_cart_url(self):
-        return reverse("orders:add-to-cart", kwargs={"slug": self.product.slug, "size": self.size.name})
+    # def get_add_to_cart_url(self):
+    #     return reverse("orders:add-to-cart", kwargs={"slug": self.product.slug})
 
 
 class ProductImage(models.Model):

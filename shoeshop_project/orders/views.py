@@ -50,13 +50,13 @@ def add_to_cart(request, slug):
         user=request.user,
         product_variation=product_variation
     )
-    # находим незавершенные заказы этого юзра
+    # находим незавершенные заказы этого юзера
     order = Order.objects.filter(user=request.user, ordered=False)
     if order.exists():
         order = order[0]
         # проверяет, есть ли в заказе добавляемый товар
-        if order.products.filter(product_variation__product__slug=product_variation.product.slug,
-                                 product_variation__size=size).exists():
+        if order.products.filter(product_variation__product__slug=slug,
+                                 product_variation__size__name=size).exists():
             order_item.quantity += quantity
             order_item.save()
             return redirect("orders:cart")

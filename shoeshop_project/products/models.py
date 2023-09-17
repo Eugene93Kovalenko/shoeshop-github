@@ -158,9 +158,6 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse("products:product-detail", kwargs={"product_slug": self.slug})
 
-    # def get_collection_absolute_url(self):
-    #     return reverse("product_app:collection", kwargs={"collection_name": self.collection})
-
     def get_add_to_cart_url(self):
         return reverse("orders:add-to-cart", kwargs={"slug": self.slug})
 

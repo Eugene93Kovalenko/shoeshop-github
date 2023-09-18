@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views import generic
 
+from orders.forms import CheckoutForm
 from orders.models import *
 from products.models import Product
 
@@ -71,22 +72,42 @@ def add_to_cart(request, slug):
 
 def remove_from_cart(request, slug):
     print('++++++')
+    # size = request.GET.get('size')
+    # product_variation = get_object_or_404(ProductVariation, product__slug=slug, size__name=size)
+    # order_qs = Order.objects.filter(user=request.user, ordered=False)
+
+    # if order_qs.exists():
+    #     order = order_qs[0]
+    #     if order.products.filter(product_variation__product__slug=slug,
+    #                              product_variation__size__name=size).exists():
+    #         order_item = OrderItem.objects.filter(
+    #             product_variation=product_variation,
+    #             user=request.user,
+    #             ordered=False
+    #         )[0]
+    #         order.products.remove(order_item)
+    #         order_item.delete()
+    #         return redirect("orders:cart")
+    #     else:
+    #         return redirect("orders:cart")
+    # else:
+    #     return redirect("orders:cart")
     size = request.GET.get('size')
     product_variation = get_object_or_404(ProductVariation, product__slug=slug, size__name=size)
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
-    if order_qs.exists():
-        order = order_qs[0]
-        if order.products.filter(product_variation__product__slug=slug,
-                                 product_variation__size__name=size).exists():
-            order_item = OrderItem.objects.filter(
-                product_variation=product_variation,
-                user=request.user,
-                ordered=False
-            )[0]
-            order.products.remove(order_item)
-            order_item.delete()
-            return redirect("orders:cart")
-        else:
-            return redirect("orders:cart")
-    else:
-        return redirect("orders:cart")
+    order = Order.objects.get(user=request.user, ordered=False)
+    order_item = OrderItem.objects.get(
+        product_variation=product_variation,
+        user=request.user,
+        ordered=False
+    )
+    order.products.remove(order_item)
+    order_item.delete()
+    return redirect("orders:cart")
+
+
+class CheckoutView(generic.FormView):
+    template_name = "orders/checkout.html"
+    form_class = CheckoutForm
+
+
+

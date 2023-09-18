@@ -132,12 +132,6 @@ class ProductVariation(models.Model):
     def __str__(self):
         return f"{self.product} / {self.size} size"
 
-    # def get_absolute_url(self):
-    #     return reverse("products:product-detail", kwargs={"product_slug": self.product.slug})
-
-    # def get_add_to_cart_url(self):
-    #     return reverse("orders:add-to-cart", kwargs={"slug": self.product.slug})
-
 
 class ProductImage(models.Model):
     image = models.ImageField(upload_to="product/%Y/%m/%d/")

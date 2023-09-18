@@ -110,4 +110,8 @@ class CheckoutView(generic.FormView):
     form_class = CheckoutForm
 
 
+class OrderCompleteView(generic.TemplateView):
+    template_name = "orders/order-complete.html"
+
+
 

@@ -30,25 +30,32 @@ class ShopView(generic.ListView):
     paginate_by = 2
 
     def get_filters(self):
-        brand_q, color_q, material_q, size_q = Q(), Q(), Q(), Q()
+        brand_q, size_q, category_q, color_q, material_q, style_q = Q(), Q(), Q(), Q(), Q(), Q()
 
         for brand in self.request.GET.getlist('brand'):
             if brand:
                 brand_q |= Q(brand__name=brand)
 
-        for material in self.request.GET.getlist('material'):
-            if material:
-                material_q |= Q(material__name=material)
+        for size in self.request.GET.getlist('size'):
+            if size:
+                size_q |= Q(product_variation__size__name=size)
+
+        for category in self.request.GET.getlist('category'):
+            if category:
+                category_q |= Q(category__name=category)
 
         for color in self.request.GET.getlist('color'):
             if color:
                 color_q |= Q(color__name=color)
 
-        for size in self.request.GET.getlist('size'):
-            if size:
-                size_q |= Q(size=size)
+        for material in self.request.GET.getlist('material'):
+            if material:
+                material_q |= Q(material__name=material)
 
-        return brand_q & color_q & material_q & size_q
+        for style in self.request.GET.getlist('style'):
+            if style:
+                style_q |= Q(style__name=style)
+        return brand_q & size_q & category_q & color_q & material_q & style_q
 
     def get_queryset(self):
         return Product.objects.filter(self.get_filters())

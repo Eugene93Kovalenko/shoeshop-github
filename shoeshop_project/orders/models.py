@@ -84,7 +84,7 @@ class Address(models.Model):
 
     class Meta:
         verbose_name = 'Адрес'
-        verbose_name_plural = 'Адресы'
+        verbose_name_plural = 'Адреса'
 
     def __str__(self):
         return f'{self.user} | {self.city} | {self.address}'
@@ -96,6 +96,10 @@ class Payment(models.Model):
                              on_delete=models.SET_NULL, blank=True, null=True)
     amount = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Оплата'
+        verbose_name_plural = 'Оплаты'
 
     def __str__(self):
         return self.user

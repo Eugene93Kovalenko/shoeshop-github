@@ -13,7 +13,7 @@ class CartView(generic.ListView):
     context_object_name = 'cart_items'
 
     def get_queryset(self):
-        return OrderItem.objects.filter(user=self.request.user)
+        return OrderItem.objects.filter(user=self.request.user).order_by('-created_at')
 
     def get_total_discount(self):
         total_discount = 0

@@ -25,6 +25,16 @@
             <div class="row">
                 {% include 'include/sidebar_filters.html' %}
                 <div class="col-lg-9 col-xl-9">
+                    <div class="sorting-options">
+                        <label for="sort-select">Sort by:</label>
+                        <select id="sort-select">
+                            <option value="price-asc">Цена: по возрастанию</option>
+                            <option value="price-desc">Цена: по убыванию</option>
+                            <option value="name-asc">Имя: по алфавиту</option>
+                            <option value="name-desc">Имя: в обратном порядке</option>
+                        </select>
+                        <button id="sort-button">Сортировать</button>
+                    </div>
                     <div class="row row-pb-md">
                         {% for product in products %}
                         <div class="col-lg-4 mb-4 text-center">
@@ -35,12 +45,10 @@
                                 </a>
                                 <div class="desc">
                                     <h2><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
-<!--                                    <span class="price">${{ product.price }}</span>-->
-<!--                                    {% if product.discount_price %}-->
-<!--                                    <span class="price">${{ product.discount_price }}</span>-->
-<!--                                    {% endif %}-->
                                     {% if product.discount_price %}
-                                    <h6>${{ product.discount_price }} <del class="text-muted ml-2">${{ product.price }}</del></h6>
+                                    <h6>${{ product.discount_price }}
+                                        <del class="text-muted ml-2">${{ product.price }}</del>
+                                    </h6>
                                     {% else %}
                                     <h6>${{ product.price }}</h6>
                                     {% endif %}
@@ -55,5 +63,5 @@
         </div>
     </div>
 </div>
-    {% include 'include/partners.html' %}
-    {% endblock content %}
+{% include 'include/partners.html' %}
+{% endblock content %}

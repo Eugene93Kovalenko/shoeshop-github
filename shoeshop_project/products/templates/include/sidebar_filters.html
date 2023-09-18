@@ -18,18 +18,6 @@
             <!--END BRAND-->
 
             <!--SIZE-->
-<!--            <div class="col-sm-12">-->
-<!--                <div class="side border mb-1">-->
-<!--                    <h3>Size</h3>-->
-<!--                    <div class="block-26 mb-2">-->
-<!--                        <ul>-->
-<!--                            {% for size in sizes_list %}-->
-<!--                            <li><a href="#">{{ size.name }}</a></li>-->
-<!--                            {% endfor %}-->
-<!--                        </ul>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
             <div class="col-sm-12">
                 <div class="side border mb-1">
                     <h3>Size</h3>
@@ -37,11 +25,9 @@
                         <ul>
                             {% for size in sizes_list %}
                             <label class="checkbox-btn">
-                                <input type="checkbox" name="size" value="{{ size.lower }}">
+                                <input type="checkbox" name="size" value="{{ size }}">
                                 <span>{{ size.name }}</span>
                             </label>
-<!--                            <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off">-->
-<!--                            <label class="btn btn-secondary" for="option2">{{ size.name }}</label>-->
                             {% endfor %}
                         </ul>
                     </div>
@@ -54,8 +40,14 @@
                 <div class="side border mb-1">
                     <h3>Category</h3>
                     <ul>
-                        {% for cat in categories_list %}
-                        <li><a href="#">{{ cat.name }}</a></li>
+                        {% for category in categories_list %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="{{ category }}"
+                                   id="category-{{ forloop.counter0 }}" name="category">
+                            <label class="form-check-label" for="category-{{ forloop.counter0 }}">
+                                {{ category }}
+                            </label>
+                        </div>
                         {% endfor %}
                     </ul>
                 </div>
@@ -85,15 +77,15 @@
             <div class="col-sm-12">
                 <div class="side border mb-1">
                     <h3>Material</h3>
-                        {% for material in materials_list %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="{{ material }}"
-                                   id="material-{{ forloop.counter0 }}" name="material">
-                            <label class="form-check-label" for="material-{{ forloop.counter0 }}">
-                                {{ material }}
-                            </label>
-                        </div>
-                        {% endfor %}
+                    {% for material in materials_list %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{ material }}"
+                               id="material-{{ forloop.counter0 }}" name="material">
+                        <label class="form-check-label" for="material-{{ forloop.counter0 }}">
+                            {{ material }}
+                        </label>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
             <!--END MATERIAL-->
@@ -102,17 +94,15 @@
             <div class="col-sm-12">
                 <div class="side border mb-1">
                     <h3>Style</h3>
-<!--                    <ul>-->
-                        {% for style in stiles_list %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="{{ style.id }}"
-                                   id="style-{{ forloop.counter0 }}" name="style">
-                            <label class="form-check-label" for="style-{{ forloop.counter0 }}">
-                                {{ style.name }}
-                            </label>
-                        </div>
-                        {% endfor %}
-<!--                    </ul>-->
+                    {% for style in stiles_list %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="{{ style }}"
+                               id="style-{{ forloop.counter0 }}" name="style">
+                        <label class="form-check-label" for="style-{{ forloop.counter0 }}">
+                            {{ style }}
+                        </label>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
             <!--END STYLE-->
@@ -145,7 +135,9 @@
 <!--                localStorage.setItem('checkboxState', 'unchecked');-->
 <!--            }-->
 <!--        });-->
-    </script>
+
+
+</script>
 
 <script>
 <!--        // Получаем ссылку на элемент checkbox по его ID-->
@@ -159,10 +151,12 @@
 <!--                location.reload();-->
 <!--            }-->
 <!--        });-->
+
+
 </script>
 
 
-    <script>
+<script>
 <!--        // Функция для сохранения состояния чекбоксов в localStorage-->
 <!--        function saveCheckboxState(groupClass) {-->
 <!--            const checkboxes = document.querySelectorAll(groupClass);-->
@@ -195,11 +189,12 @@
 <!--        saveCheckboxState('input[type="checkbox"]');-->
 
 <!--        restoreCheckboxState('input[type="checkbox"]');-->
-    </script>
 
 
+</script>
 
-    <script>
+
+<script>
         // Функция для сохранения состояния чекбоксов в localStorage
         function saveCheckboxState() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -245,4 +240,6 @@
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', saveCheckboxState);
         });
-    </script>
+
+
+</script>

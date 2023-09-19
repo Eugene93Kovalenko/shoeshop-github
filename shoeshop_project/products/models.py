@@ -30,17 +30,6 @@ class Gender(models.Model):
         verbose_name_plural = "Гендеры"
 
 
-class Style(models.Model):
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "Стиль"
-        verbose_name_plural = "Стили"
-
-
 class Brand(models.Model):
     name = models.CharField(max_length=50)
 
@@ -91,7 +80,6 @@ class Product(models.Model):
     discount_price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     material = models.ForeignKey(Material, on_delete=models.CASCADE, blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
-    style = models.ForeignKey(Style, on_delete=models.CASCADE, blank=True, null=True)
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     description = models.TextField(blank=False)

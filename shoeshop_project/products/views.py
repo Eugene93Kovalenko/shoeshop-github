@@ -30,7 +30,7 @@ class ShopView(generic.ListView):
     paginate_by = 2
 
     def get_filters(self):
-        brand_q, size_q, category_q, color_q, material_q, style_q = Q(), Q(), Q(), Q(), Q(), Q()
+        brand_q, size_q, category_q, color_q, material_q = Q(), Q(), Q(), Q(), Q()
 
         for brand in self.request.GET.getlist('brand'):
             if brand:
@@ -52,10 +52,7 @@ class ShopView(generic.ListView):
             if material:
                 material_q |= Q(material__name=material)
 
-        for style in self.request.GET.getlist('style'):
-            if style:
-                style_q |= Q(style__name=style)
-        return brand_q & size_q & category_q & color_q & material_q & style_q
+        return brand_q & size_q & category_q & color_q & material_q
 
     def get_urlencode_for_ordering(self):
         urlencode = self.request.GET.urlencode()
@@ -85,7 +82,6 @@ class ShopView(generic.ListView):
         context['categories_list'] = Category.objects.all()
         context['colors_list'] = Color.objects.all()
         context['materials_list'] = Material.objects.all()
-        context['stiles_list'] = Style.objects.all()
         context['genders_list'] = Gender.objects.all().exclude(name='Unisex').order_by('name')
         context['selected_size'] = [int(size) for size in self.request.GET.getlist('size')]
         context['selected_brand'] = [brand for brand in self.request.GET.getlist('brand')]

@@ -2,15 +2,29 @@
 <div class="col-lg-3 col-xl-3">
     <div class="row">
         <form method="get">
+            <div class="col-sm-12">
+                <div class="side border mb-1">
+                    <h3>Sorting</h3>
+                    {% for order_name, order_val in ordering_options %}
+                    <div class="form-check">
+                        <input class="form-check-input" {% if order_val in selected_ordering %} checked {% endif %}
+                               type="radio" value="{{ order_val }}"
+                               id="order-{{ forloop.counter0 }}" name="ordering">
+                        <label class="form-check-label" for="order-{{ forloop.counter0 }}">{{ order_name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
             <!--BRAND-->
             <div class="col-sm-12">
                 <div class="side border mb-1">
                     <h3>Brand</h3>
                     {% for brand in brands_list %}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="{{ brand.name }}"
-                               id="brand-1" name="brand">
-                        <label class="form-check-label" for="brand-1"> {{ brand.name }}</label>
+                        <input class="form-check-input" {% if brand.name in selected_brand %} checked {% endif %}
+                               type="checkbox" value="{{ brand.name }}"
+                               id="brand-{{ forloop.counter0 }}" name="brand">
+                        <label class="form-check-label" for="brand-{{ forloop.counter0 }}"> {{ brand.name }}</label>
                     </div>
                     {% endfor %}
                 </div>
@@ -25,7 +39,8 @@
                         <ul>
                             {% for size in sizes_list %}
                             <label class="checkbox-btn">
-                                <input type="checkbox" name="size" value="{{ size }}">
+                                <input type="checkbox" {% if size.name in selected_size %} checked {% endif %}
+                                       name="size" value="{{ size }}">
                                 <span>{{ size.name }}</span>
                             </label>
                             {% endfor %}
@@ -113,133 +128,41 @@
     </div>
 </div>
 
-<script>
-<!--        // Получаем ссылку на элемент checkbox по его ID-->
-<!--        const checkbox = document.querySelectorAll('color-0', 'color-1', 'brand-0', 'brand-1');-->
-
-<!--        // Проверяем, есть ли значение состояния checkbox в localStorage-->
-<!--        const checkboxState = localStorage.getItem('checkboxState');-->
-
-<!--        // Если есть сохраненное значение состояния, устанавливаем его-->
-<!--        if (checkboxState === 'checked') {-->
-<!--            checkbox.checked = true;-->
-<!--        }-->
-
-<!--        // Добавляем обработчик события "click" на элемент checkbox-->
-<!--        checkbox.addEventListener('click', function() {-->
-<!--            // Сохраняем текущее состояние checkbox в localStorage-->
-<!--            if (checkbox.checked) {-->
-<!--                localStorage.setItem('checkboxState', 'checked');-->
-<!--&lt;!&ndash;                location.reload();&ndash;&gt;-->
-<!--            } else {-->
-<!--                localStorage.setItem('checkboxState', 'unchecked');-->
-<!--            }-->
-<!--        });-->
-
-
-</script>
 
 <script>
-<!--        // Получаем ссылку на элемент checkbox по его ID-->
-<!--        const checkbox = document.getElementById('color-0');-->
+<!--// Функция для сохранения состояния чекбоксов в localStorage-->
+<!--function saveCheckboxState() {-->
+<!--    const checkboxes = document.querySelectorAll('input[type="checkbox"]');-->
+<!--    const checkboxState = {};-->
 
-<!--        // Добавляем обработчик события "click" на элемент checkbox-->
-<!--        checkbox.addEventListener('click', function() {-->
-<!--            // Проверяем, был ли элемент checkbox отмечен-->
-<!--            if (checkbox.checked) {-->
-<!--                // Если отмечен, перезагружаем страницу-->
-<!--                location.reload();-->
-<!--            }-->
-<!--        });-->
+<!--    checkboxes.forEach(checkbox => {-->
+<!--        checkboxState[checkbox.id] = checkbox.checked;-->
+<!--    });-->
 
+<!--    localStorage.setItem('checkboxState', JSON.stringify(checkboxState));-->
+<!--}-->
 
-</script>
+<!--// Функция для восстановления состояния чекбоксов из localStorage-->
+<!--function restoreCheckboxState() {-->
+<!--    const checkboxState = JSON.parse(localStorage.getItem('checkboxState'));-->
 
-
-<script>
-<!--        // Функция для сохранения состояния чекбоксов в localStorage-->
-<!--        function saveCheckboxState(groupClass) {-->
-<!--            const checkboxes = document.querySelectorAll(groupClass);-->
-<!--            const checkboxState = {};-->
-
-<!--            checkboxes.forEach(checkbox => {-->
-<!--                checkboxState[checkbox.value] = checkbox.checked;-->
-<!--            });-->
-
-<!--            localStorage.setItem(groupClass, JSON.stringify(checkboxState));-->
-<!--        }-->
-
-<!--        // Функция для восстановления состояния чекбоксов из localStorage-->
-<!--        function restoreCheckboxState(groupClass) {-->
-<!--            const checkboxes = document.querySelectorAll(groupClass);-->
-<!--            const storedState = localStorage.getItem(groupClass);-->
-
-<!--            if (storedState) {-->
-<!--                const checkboxState = JSON.parse(storedState);-->
-
-<!--                checkboxes.forEach(checkbox => {-->
-<!--                    if (checkboxState[checkbox.value]) {-->
-<!--                        checkbox.checked = true;-->
-<!--                    }-->
-<!--                });-->
+<!--    if (checkboxState) {-->
+<!--        for (const id in checkboxState) {-->
+<!--            if (checkboxState.hasOwnProperty(id)) {-->
+<!--                const checkbox = document.getElementById(id);-->
+<!--                if (checkbox) {-->
+<!--                    checkbox.checked = checkboxState[id];-->
+<!--                }-->
 <!--            }-->
 <!--        }-->
+<!--    }-->
+<!--}-->
 
-<!--        // Вызываем функции для сохранения и восстановления состояния чекбоксов для каждой группы-->
-<!--        saveCheckboxState('input[type="checkbox"]');-->
+<!--// Вызываем функцию восстановления состояния при загрузке страницы-->
+<!--window.addEventListener('load', restoreCheckboxState);-->
 
-<!--        restoreCheckboxState('input[type="checkbox"]');-->
-
-
-</script>
-
-
-<script>
-        // Функция для сохранения состояния чекбоксов в localStorage
-        function saveCheckboxState() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            console.log('document.querySelectorAll('input[type="checkbox"]')');
-            const checkboxState = {};
-
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    const groupName = checkbox.getAttribute('name');
-                    if (!checkboxState[groupName]) {
-                        checkboxState[groupName] = [];
-                    }
-                    checkboxState[groupName].push(checkbox.value);
-                }
-            });
-
-            localStorage.setItem('checkboxState', JSON.stringify(checkboxState));
-        }
-
-        // Функция для восстановления состояния чекбоксов из localStorage
-        function restoreCheckboxState() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            const storedState = localStorage.getItem('checkboxState');
-
-            if (storedState) {
-                const checkboxState = JSON.parse(storedState);
-
-                checkboxes.forEach(checkbox => {
-                    const groupName = checkbox.getAttribute('name');
-                    if (checkboxState[groupName] && checkboxState[groupName].includes(checkbox.value)) {
-                        checkbox.checked = true;
-                    }
-                });
-            }
-        }
-
-        // Вызываем функции для сохранения и восстановления состояния чекбоксов
-        saveCheckboxState();
-        restoreCheckboxState();
-
-        // Добавляем обработчик события для чекбоксов
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', saveCheckboxState);
-        });
-
+<!--// Добавляем обработчик события на кнопку "Submit" для сохранения состояния чекбоксов перед перезагрузкой-->
+<!--const submitButton = document.querySelector('.button-container button');-->
+<!--submitButton.addEventListener('click', saveCheckboxState);-->
 
 </script>

@@ -57,22 +57,44 @@ class ShopView(generic.ListView):
                 style_q |= Q(style__name=style)
         return brand_q & size_q & category_q & color_q & material_q & style_q
 
+    def get_urlencode_for_ordering(self):
+        urlencode = self.request.GET.urlencode()
+        if 'ordering' in urlencode:
+            if urlencode.count('=') == 1:
+                urlencode = ''
+            else:
+                urlencode = urlencode[urlencode.find('&') + 1:]
+        return urlencode
+
+    def get_ordering(self):
+        return self.request.GET.get('ordering')
+
     def get_queryset(self):
+        if self.request.GET.get("ordering"):
+            # if self.request.path == '/shop/men/':
+            #     return Product.objects.filter(self.get_filters(), gender__name='Men')
+            # elif self.request.path == '/shop/women/':
+            #     return Product.objects.filter(self.get_filters(), gender__name='Women')
+            return Product.objects.filter(self.get_filters()).order_by(self.get_ordering())
         return Product.objects.filter(self.get_filters())
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['brands_list'] = set([product.brand for product in Product.objects.all()])
         context['brands_list'] = Brand.objects.all()
-        # context['sizes_list'] = [product.size for product in SizeVariation.objects.distinct('size')]
         context['sizes_list'] = Size.objects.all()
-        # context['categories_list'] = [product.category for product in Product.objects.all()]
         context['categories_list'] = Category.objects.all()
-        # context['colors_list'] = set([product.get_color_display for product in Product.objects.all()])
         context['colors_list'] = Color.objects.all()
-        # context['materials_list'] = set([product.get_material_display for product in Product.objects.all()])
         context['materials_list'] = Material.objects.all()
         context['stiles_list'] = Style.objects.all()
+        context['genders_list'] = Gender.objects.all().exclude(name='Unisex').order_by('name')
+        context['selected_size'] = [int(size) for size in self.request.GET.getlist('size')]
+        context['selected_brand'] = [brand for brand in self.request.GET.getlist('brand')]
+        context['selected_ordering'] = self.request.GET.get('ordering')
+        context['ordering_options'] = [
+            ('Popularity', 'num_visits'), ('Last', '-created_at'), ('Price high first', 'price'),
+            ('Price low first', '-price')
+        ]
+        context['url'] = self.get_urlencode_for_ordering()
         return context
 
 
@@ -81,9 +103,6 @@ class ProductDetailView(generic.DetailView):
     template_name = "products/product-detail.html"
     context_object_name = "product"
     slug_url_kwarg = "product_slug"
-
-    # def get_queryset(self):
-    #     return ProductVariation.objects.filter(product__slug=self.kwargs["product_slug"])
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)

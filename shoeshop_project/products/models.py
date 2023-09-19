@@ -113,6 +113,9 @@ class Product(models.Model):
     def get_remove_from_cart_url(self):
         return reverse("orders:remove-from-cart", kwargs={"slug": self.slug})
 
+    def get_gender_url(self):
+        return reverse("products:gender", kwargs={"gender_slug": self.gender.name})
+
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"

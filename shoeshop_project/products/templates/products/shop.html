@@ -1,67 +1,46 @@
 {% extends 'base.html' %}
 {% load static %}
+<!--{% load custom_tags %}-->
 
 {% block content %}
 <div class="colorlib-loader"></div>
 
 <div id="page">
     {% include 'include/breadcrumbs.html' %}
-    <div class="breadcrumbs-two">
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <div class="breadcrumbs-img" style="">
-                        <h2>Women's</h2>
-                    </div>
-                    <div class="menu text-center">
-                        <p><a href="#">New Arrivals</a> <a href="#">Best Sellers</a> <a href="#">Sale</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="colorlib-product">
-        <div class="container">
-            <div class="row">
-                {% include 'include/sidebar_filters.html' %}
-                <div class="col-lg-9 col-xl-9">
-                    <div class="sorting-options">
-                        <label for="sort-select">Sort by:</label>
-                        <select id="sort-select">
-                            <option value="price-asc">Цена: по возрастанию</option>
-                            <option value="price-desc">Цена: по убыванию</option>
-                            <option value="name-asc">Имя: по алфавиту</option>
-                            <option value="name-desc">Имя: в обратном порядке</option>
-                        </select>
-                        <button id="sort-button">Сортировать</button>
-                    </div>
-                    <div class="row row-pb-md">
-                        {% for product in products %}
-                        <div class="col-lg-4 mb-4 text-center">
-                            <div class="product-entry border">
-                                <a href="{{ product.get_absolute_url }}" class="prod-img">
-                                    <img src="{{ product.images.first.get_absolute_url }}" class="img-fluid"
-                                         alt="img">
-                                </a>
-                                <div class="desc">
-                                    <h2><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
-                                    {% if product.discount_price %}
-                                    <h6>${{ product.discount_price }}
-                                        <del class="text-muted ml-2">${{ product.price }}</del>
-                                    </h6>
-                                    {% else %}
-                                    <h6>${{ product.price }}</h6>
-                                    {% endif %}
-                                </div>
+
+    <!--<div class="colorlib-product">-->
+    <div class="container">
+        <div class="row">
+
+            {% include 'include/sidebar_filters.html' %}
+            <div class="col-lg-9 col-xl-9">
+                <div class="row row-pb-md">
+                    {% for product in products %}
+                    <div class="col-lg-4 mb-4 text-center">
+                        <div class="product-entry border">
+                            <a href="{{ product.get_absolute_url }}" class="prod-img">
+                                <img src="{{ product.images.first.get_absolute_url }}" class="img-fluid"
+                                     alt="img">
+                            </a>
+                            <div class="desc">
+                                <h2><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h2>
+                                {% if product.discount_price %}
+                                <h6>${{ product.discount_price }}
+                                    <del class="text-muted ml-2">${{ product.price }}</del>
+                                </h6>
+                                {% else %}
+                                <h6>${{ product.price }}</h6>
+                                {% endif %}
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
-                    {% include 'include/pagination.html' %}
+                    {% endfor %}
                 </div>
+                {% include 'include/pagination.html' %}
             </div>
         </div>
     </div>
+    <!--</div>-->
 </div>
 {% include 'include/partners.html' %}
 {% endblock content %}

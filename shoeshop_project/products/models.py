@@ -75,6 +75,13 @@ class Material(models.Model):
 
 
 class Product(models.Model):
+    ORDERING_OPTIONS = [
+        ('Popularity', '-num_visits'),
+        ('Last', '-created_at'),
+        ('Price high first', '-price'),
+        ('Price low first', 'price')
+    ]
+
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     discount_price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
@@ -106,7 +113,6 @@ class Product(models.Model):
 
     def get_gender_url(self):
         return reverse("products:gender", kwargs={"gender_slug": self.gender.name})
-
 
     class Meta:
         verbose_name = "Товар"

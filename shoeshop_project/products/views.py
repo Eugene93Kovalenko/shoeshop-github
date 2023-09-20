@@ -89,10 +89,7 @@ class ShopView(generic.ListView):
         context['selected_brand'] = [brand for brand in self.request.GET.getlist('brand')]
         context['selected_ordering'] = self.request.GET.get('ordering')
         print(context['selected_ordering'])
-        context['ordering_options'] = [
-            ('Popularity', '-num_visits'), ('Last', '-created_at'), ('Price high first', '-price'),
-            ('Price low first', 'price')
-        ]
+        context['ordering_options'] = Product.ORDERING_OPTIONS
         context['url'] = self.get_urlencode_for_ordering()
         return context
 

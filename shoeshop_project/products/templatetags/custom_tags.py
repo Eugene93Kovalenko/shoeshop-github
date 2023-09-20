@@ -7,10 +7,6 @@ register = template.Library()
 # для того, чтобы пагинация работала при сортировке
 @register.simple_tag()
 def relative_url(argument, value, urlencode=None):
-    print('--------------------')
-    print(argument)
-    print(value)
-    print(urlencode)
     url = f'?{argument}={value}'
     if urlencode.count('=') == 1 and urlencode.startswith('page'):
         return url

@@ -20,6 +20,7 @@ class HomeView(generic.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["count_cart_items"] = OrderItem.objects.filter(user=self.request.user).count()
         return context
 
 
@@ -32,13 +33,14 @@ class ShopView(generic.ListView):
     def get_filters(self):
         brand_q, size_q, category_q, color_q, material_q = Q(), Q(), Q(), Q(), Q()
 
-        for brand in self.request.GET.getlist('brand'):
-            if brand:
+        if self.request.GET.getlist('brand'):
+            for brand in self.request.GET.getlist('brand'):
                 brand_q |= Q(brand__name=brand)
 
-        for size in self.request.GET.getlist('size'):
-            if size:
+        if self.request.GET.getlist('size'):
+            for size in self.request.GET.getlist('size'):
                 size_q |= Q(product_variation__size__name=size)
+                print(size_q)
 
         for category in self.request.GET.getlist('category'):
             if category:
@@ -67,13 +69,13 @@ class ShopView(generic.ListView):
         return self.request.GET.get('ordering')
 
     def get_queryset(self):
-        if self.request.GET.get("ordering"):
+        if self.get_ordering():
             # if self.request.path == '/shop/men/':
             #     return Product.objects.filter(self.get_filters(), gender__name='Men')
             # elif self.request.path == '/shop/women/':
             #     return Product.objects.filter(self.get_filters(), gender__name='Women')
-            return Product.objects.filter(self.get_filters()).order_by(self.get_ordering())
-        return Product.objects.filter(self.get_filters())
+            return Product.objects.filter(self.get_filters()).order_by(self.get_ordering()).distinct()
+        return Product.objects.filter(self.get_filters()).distinct()
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -86,9 +88,10 @@ class ShopView(generic.ListView):
         context['selected_size'] = [int(size) for size in self.request.GET.getlist('size')]
         context['selected_brand'] = [brand for brand in self.request.GET.getlist('brand')]
         context['selected_ordering'] = self.request.GET.get('ordering')
+        print(context['selected_ordering'])
         context['ordering_options'] = [
-            ('Popularity', 'num_visits'), ('Last', '-created_at'), ('Price high first', 'price'),
-            ('Price low first', '-price')
+            ('Popularity', '-num_visits'), ('Last', '-created_at'), ('Price high first', '-price'),
+            ('Price low first', 'price')
         ]
         context['url'] = self.get_urlencode_for_ordering()
         return context

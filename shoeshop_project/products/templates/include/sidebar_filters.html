@@ -2,12 +2,13 @@
 <div class="col-lg-3 col-xl-3">
     <div class="row">
         <form method="get">
+            <!--SORTING-->
             <div class="col-sm-12">
                 <div class="side border mb-1">
-                    <h3>Sorting</h3>
+                    <h3>Sorting by</h3>
                     {% for order_name, order_val in ordering_options %}
                     <div class="form-check">
-                        <input class="form-check-input" {% if order_val in selected_ordering %} checked {% endif %}
+                        <input class="form-check-input" {% if order_val == selected_ordering %} checked {% endif %}
                                type="radio" value="{{ order_val }}"
                                id="order-{{ forloop.counter0 }}" name="ordering">
                         <label class="form-check-label" for="order-{{ forloop.counter0 }}">{{ order_name }}</label>
@@ -15,6 +16,8 @@
                     {% endfor %}
                 </div>
             </div>
+            <!--END SORTING-->
+
             <!--BRAND-->
             <div class="col-sm-12">
                 <div class="side border mb-1">
@@ -112,41 +115,8 @@
     </div>
 </div>
 
-
 <script>
-<!--// Функция для сохранения состояния чекбоксов в localStorage-->
-<!--function saveCheckboxState() {-->
-<!--    const checkboxes = document.querySelectorAll('input[type="checkbox"]');-->
-<!--    const checkboxState = {};-->
 
-<!--    checkboxes.forEach(checkbox => {-->
-<!--        checkboxState[checkbox.id] = checkbox.checked;-->
-<!--    });-->
 
-<!--    localStorage.setItem('checkboxState', JSON.stringify(checkboxState));-->
-<!--}-->
-
-<!--// Функция для восстановления состояния чекбоксов из localStorage-->
-<!--function restoreCheckboxState() {-->
-<!--    const checkboxState = JSON.parse(localStorage.getItem('checkboxState'));-->
-
-<!--    if (checkboxState) {-->
-<!--        for (const id in checkboxState) {-->
-<!--            if (checkboxState.hasOwnProperty(id)) {-->
-<!--                const checkbox = document.getElementById(id);-->
-<!--                if (checkbox) {-->
-<!--                    checkbox.checked = checkboxState[id];-->
-<!--                }-->
-<!--            }-->
-<!--        }-->
-<!--    }-->
-<!--}-->
-
-<!--// Вызываем функцию восстановления состояния при загрузке страницы-->
-<!--window.addEventListener('load', restoreCheckboxState);-->
-
-<!--// Добавляем обработчик события на кнопку "Submit" для сохранения состояния чекбоксов перед перезагрузкой-->
-<!--const submitButton = document.querySelector('.button-container button');-->
-<!--submitButton.addEventListener('click', saveCheckboxState);-->
 
 </script>

@@ -15,6 +15,7 @@
             {% include 'include/sidebar_filters.html' %}
             <div class="col-lg-9 col-xl-9">
                 <div class="row row-pb-md">
+                    {% if products %}
                     {% for product in products %}
                     <div class="col-lg-4 mb-4 text-center">
                         <div class="product-entry border">
@@ -35,6 +36,9 @@
                         </div>
                     </div>
                     {% endfor %}
+                    {% else %}
+                    <h1>No products found</h1>
+                    {% endif %}
                 </div>
                 {% include 'include/pagination.html' %}
             </div>

@@ -23,18 +23,18 @@
                         <li class="has-dropdown">
                             <a href="">Pages</a>
                             <ul class="dropdown">
-                                <li><a href="{% url 'products:shop' %}">Shop</a></li>
                                 <li><a href="{% url 'orders:cart' %}">Shopping Cart</a></li>
                                 <li><a href="{% url 'orders:checkout' %}">Checkout</a></li>
                                 <li><a href="{% url 'orders:order-complete' %}">Order Complete</a></li>
                             </ul>
                         </li>
+                        <li><a href="{% url 'products:shop' %}">Shop</a></li>
                         <li><a href="{% url 'products:shop-men' %}">Men</a></li>
                         <li><a href="{% url 'products:shop-women' %}">Women</a></li>
                         <li><a href="{% url 'products:about' %}">About</a></li>
                         <li><a href="{% url 'products:contact' %}">Contact</a></li>
                         <li class="cart"><a href="{% url 'orders:cart' %}"><i class="icon-shopping-cart"></i> Cart
-                            [0]</a></li>
+                            [{{ count_cart_items }}]</a></li>
                         {% if user.is_authenticated %}
                         <li class="cart"><a href="{% url 'accounts:logout' %}">Sign Out</a></li>
                         {% else %}
@@ -47,3 +47,10 @@
         </div>
     </div>
 </nav>
+
+<style>
+    $(function() {
+  $('nav a[href^="/' + location.pathname.split("/")[1] + '"]').addClass('active');
+});
+
+</style>

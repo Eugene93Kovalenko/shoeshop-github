@@ -92,6 +92,9 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    # def counter(self):
+    #     return self.num_visits += 1
+
     def get_absolute_url(self):
         return reverse("products:product-detail", kwargs={"product_slug": self.slug})
 
@@ -103,6 +106,7 @@ class Product(models.Model):
 
     def get_gender_url(self):
         return reverse("products:gender", kwargs={"gender_slug": self.gender.name})
+
 
     class Meta:
         verbose_name = "Товар"

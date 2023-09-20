@@ -32,6 +32,8 @@ class CartView(generic.ListView):
         context = super().get_context_data(**kwargs)
         context["get_total_discount"] = self.get_total_discount()
         context["get_total_all_products_price"] = self.get_total_all_products_price()
+        context["count_cart_items"] = OrderItem.objects.filter(user=self.request.user).count()
+        print(context["count_cart_items"])
         if OrderItem.objects.filter(user=self.request.user, ordered=False):
             context["delivery_price"] = Order.objects.filter(user=self.request.user, ordered=False)[0].delivery_price
         else:

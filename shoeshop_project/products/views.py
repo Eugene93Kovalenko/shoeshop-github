@@ -1,3 +1,5 @@
+import time
+from timeit import timeit
 from time import timezone
 
 from django.contrib.auth.decorators import login_required
@@ -40,42 +42,34 @@ class ShopView(generic.ListView):
         if self.request.GET.getlist('size'):
             for size in self.request.GET.getlist('size'):
                 size_q |= Q(product_variation__size__name=size)
-                print(size_q)
 
-        for category in self.request.GET.getlist('category'):
-            if category:
+        if self.request.GET.getlist('category'):
+            for category in self.request.GET.getlist('category'):
                 category_q |= Q(category__name=category)
 
-        for color in self.request.GET.getlist('color'):
-            if color:
+        if self.request.GET.getlist('color'):
+            for color in self.request.GET.getlist('color'):
                 color_q |= Q(color__name=color)
 
-        for material in self.request.GET.getlist('material'):
-            if material:
+        if self.request.GET.getlist('material'):
+            for material in self.request.GET.getlist('material'):
                 material_q |= Q(material__name=material)
 
         return brand_q & size_q & category_q & color_q & material_q
-
-    def get_urlencode_for_ordering(self):
-        urlencode = self.request.GET.urlencode()
-        if 'ordering' in urlencode:
-            if urlencode.count('=') == 1:
-                urlencode = ''
-            else:
-                urlencode = urlencode[urlencode.find('&') + 1:]
-        return urlencode
 
     def get_ordering(self):
         return self.request.GET.get('ordering')
 
     def get_queryset(self):
+        gender_filters = {
+            '/shop/women/': {'gender__name': 'Women'},
+            '/shop/men/': {'gender__name': 'Men'},
+        }
+        gender_filter = gender_filters.get(self.request.path, {})
         if self.get_ordering():
-            # if self.request.path == '/shop/men/':
-            #     return Product.objects.filter(self.get_filters(), gender__name='Men')
-            # elif self.request.path == '/shop/women/':
-            #     return Product.objects.filter(self.get_filters(), gender__name='Women')
-            return Product.objects.filter(self.get_filters()).order_by(self.get_ordering()).distinct()
-        return Product.objects.filter(self.get_filters()).distinct()
+            return Product.objects.filter(self.get_filters(), **gender_filter).order_by(self.get_ordering()).distinct()
+        else:
+            return Product.objects.filter(self.get_filters(), **gender_filter).distinct()
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -88,9 +82,7 @@ class ShopView(generic.ListView):
         context['selected_size'] = [int(size) for size in self.request.GET.getlist('size')]
         context['selected_brand'] = [brand for brand in self.request.GET.getlist('brand')]
         context['selected_ordering'] = self.request.GET.get('ordering')
-        print(context['selected_ordering'])
         context['ordering_options'] = Product.ORDERING_OPTIONS
-        context['url'] = self.get_urlencode_for_ordering()
         return context
 
 

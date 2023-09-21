@@ -24,5 +24,3 @@ class CheckoutForm(forms.Form):
     phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',
                                                           'placeholder': 'Enter your phone number'}))
 
-    # class Meta:
-    #     widgets = {"country": CountrySelectWidget()}

@@ -14,7 +14,7 @@
 .checkbox-btn span {
 	display: inline-block;
 	cursor: pointer;
-	padding: 0px 10px;
+	padding: 0px 0px;
 	line-height: 30px;
 	border: 1px solid #999;
 	border-radius: 4px;
@@ -52,11 +52,9 @@
 	background: #f7efdc;
 }
 
-input[type="checkbox"][name="size"] {
-    /* Здесь можно задать желаемые стили для чекбоксов */
-    /* Например, ширина и высота */
-    width: 20px;
-    height: 20px;
+input[type="checkbox"][name="sizes"] {
+    width: 40px;
+    height: 10px;
     /* Другие стили, такие как цвет фона, рамку и т. д. */
     background-color: #fff;
     border: 1px solid #ccc;
@@ -65,3 +63,5 @@ input[type="checkbox"][name="size"] {
     /* Выравнивание текста рядом с чекбоксом */
     vertical-align: middle;
 }
+
+

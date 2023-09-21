@@ -37,8 +37,8 @@ class ShopView(generic.ListView):
             for brand in self.request.GET.getlist('brand'):
                 brand_q |= Q(brand__name=brand)
 
-        if self.request.GET.getlist('size'):
-            for size in self.request.GET.getlist('size'):
+        if self.request.GET.getlist('sizes'):
+            for size in self.request.GET.getlist('sizes'):
                 size_q |= Q(product_variation__size__name=size)
 
         if self.request.GET.getlist('category'):

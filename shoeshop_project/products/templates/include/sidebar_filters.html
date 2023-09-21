@@ -60,7 +60,8 @@
                     <ul>
                         {% for category in categories_list %}
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="{{ category }}"
+                            <input {% if category.name in selected_category %} checked {% endif %}
+                                   class="form-check-input" type="checkbox" value="{{ category }}"
                                    id="category-{{ forloop.counter0 }}" name="category">
                             <label class="form-check-label" for="category-{{ forloop.counter0 }}">
                                 {{ category }}
@@ -79,7 +80,8 @@
                     <!--                    <ul>-->
                     {% for color in colors_list %}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="{{ color }}"
+                        <input class="form-check-input" {% if color.name in selected_color %} checked {% endif %}
+                               type="checkbox" value="{{ color }}"
                                id="color-{{ forloop.counter0 }}" name="color">
                         <label class="form-check-label" for="color-{{ forloop.counter0 }}">
                             {{ color }}
@@ -97,7 +99,8 @@
                     <h3>Material</h3>
                     {% for material in materials_list %}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="{{ material }}"
+                        <input class="form-check-input" {% if material.name in selected_material %} checked {% endif %}
+                               type="checkbox" value="{{ material }}"
                                id="material-{{ forloop.counter0 }}" name="material">
                         <label class="form-check-label" for="material-{{ forloop.counter0 }}">
                             {{ material }}

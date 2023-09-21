@@ -1,5 +1,3 @@
-import time
-from timeit import timeit
 from time import timezone
 
 from django.contrib.auth.decorators import login_required
@@ -79,9 +77,12 @@ class ShopView(generic.ListView):
         context['colors_list'] = Color.objects.all()
         context['materials_list'] = Material.objects.all()
         context['genders_list'] = Gender.objects.all().exclude(name='Unisex').order_by('name')
-        context['selected_size'] = [int(size) for size in self.request.GET.getlist('size')]
-        context['selected_brand'] = [brand for brand in self.request.GET.getlist('brand')]
         context['selected_ordering'] = self.request.GET.get('ordering')
+        context['selected_brand'] = [brand for brand in self.request.GET.getlist('brand')]
+        context['selected_size'] = [int(size) for size in self.request.GET.getlist('size')]
+        context['selected_category'] = [brand for brand in self.request.GET.getlist('category')]
+        context['selected_color'] = [brand for brand in self.request.GET.getlist('color')]
+        context['selected_material'] = [brand for brand in self.request.GET.getlist('material')]
         context['ordering_options'] = Product.ORDERING_OPTIONS
         return context
 

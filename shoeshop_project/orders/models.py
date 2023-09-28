@@ -39,9 +39,9 @@ class Order(models.Model):
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     shipping_address = models.ForeignKey(
-        'Address', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
-    billing_address = models.ForeignKey(
-        'Address', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
+        'ShippingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
+    # billing_address = models.ForeignKey(
+    #     'Address', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True)
 
     # payment = models.ForeignKey(
     #     'Payment', on_delete=models.SET_NULL, blank=True, null=True)
@@ -68,18 +68,18 @@ class Order(models.Model):
     #     return total
 
 
-class Address(models.Model):
-    ADDRESS_CHOICES = (
-        ('B', 'Billing'),
-        ('S', 'Shipping'),
-    )
+class ShippingAddress(models.Model):
+    # ADDRESS_CHOICES = (
+    #     ('B', 'Billing'),
+    #     ('S', 'Shipping'),
+    # )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     country = CountryField(multiple=False)
     city = models.CharField(max_length=100)
     zip = models.CharField(max_length=20)
     address = models.CharField(max_length=150)
-    address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
+    # address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
     default = models.BooleanField(default=False)
 
     class Meta:
@@ -102,4 +102,5 @@ class Payment(models.Model):
         verbose_name_plural = 'Оплаты'
 
     def __str__(self):
-        return self.user
+        return self.user.name
+

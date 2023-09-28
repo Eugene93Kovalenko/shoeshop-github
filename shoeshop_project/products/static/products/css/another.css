@@ -14,7 +14,7 @@
 .checkbox-btn span {
 	display: inline-block;
 	cursor: pointer;
-	padding: 0px 0px;
+	padding: 0px 10px;
 	line-height: 30px;
 	border: 1px solid #999;
 	border-radius: 4px;
@@ -54,7 +54,7 @@
 
 input[type="checkbox"][name="sizes"] {
     width: 40px;
-    height: 10px;
+    height: 20px;
     /* Другие стили, такие как цвет фона, рамку и т. д. */
     background-color: #fff;
     border: 1px solid #ccc;

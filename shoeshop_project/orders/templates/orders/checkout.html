@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="colorlib-loader"></div>
@@ -10,87 +9,89 @@
     <div class="colorlib-product">
         <div class="container">
             {% include 'include/order_breadcrumbs.html' %}
-<!--            <div class="row row-pb-lg">-->
-<!--                <div class="col-sm-10 offset-md-1">-->
-<!--                    <div class="process-wrap">-->
-<!--                        <div class="process text-center active">-->
-<!--                            <p><span>01</span></p>-->
-<!--                            <h3>Shopping Cart</h3>-->
-<!--                        </div>-->
-<!--                        <div class="process text-center active">-->
-<!--                            <p><span>02</span></p>-->
-<!--                            <h3>Checkout</h3>-->
-<!--                        </div>-->
-<!--                        <div class="process text-center">-->
-<!--                            <p><span>03</span></p>-->
-<!--                            <h3>Order Complete</h3>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
+            <!--            <div class="row row-pb-lg">-->
+            <!--                <div class="col-sm-10 offset-md-1">-->
+            <!--                    <div class="process-wrap">-->
+            <!--                        <div class="process text-center active">-->
+            <!--                            <p><span>01</span></p>-->
+            <!--                            <h3>Shopping Cart</h3>-->
+            <!--                        </div>-->
+            <!--                        <div class="process text-center active">-->
+            <!--                            <p><span>02</span></p>-->
+            <!--                            <h3>Checkout</h3>-->
+            <!--                        </div>-->
+            <!--                        <div class="process text-center">-->
+            <!--                            <p><span>03</span></p>-->
+            <!--                            <h3>Order Complete</h3>-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+            <!--                </div>-->
+            <!--            </div>-->
             <div class="row">
                 <div class="col-lg-8">
-<!--                    FORM-->
+                    <!--                    FORM-->
                     <form action="" method="post" class="colorlib-form">
-                        <h2>Billing Details</h2>
+                        <h2>Shipping Details</h2>
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Select Country</label>
-                                    <div class="form-field">
-<!--                                        <i class="icon icon-arrow-down3"></i>-->
-                                        {{ form.country }}
-                                    </div>
-                                </div>
-                            </div>
-                            <!--								FIRST NAME-->
+                            <!--FIRST NAME-->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>First Name</label>
                                     {{ form.first_name }}
                                 </div>
                             </div>
-                            <!--								LAST NAME-->
+                            <!--LAST NAME-->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Last Name</label>
                                     {{ form.last_name }}
                                 </div>
                             </div>
-                            <!--							ADRESS-->
+                            <!--COUNTRY-->
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Address</label>
-                                    {{ form.address }}
+                                    <label>Select Country</label>
+                                    <div class="form-field">
+                                        {{ form.country }}
+                                    </div>
                                 </div>
                             </div>
-                            <!--							CITY-->
+                            <!--CITY-->
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Town / City</label>
                                     {{ form.city }}
                                 </div>
                             </div>
-
+                            <!--ADRESS-->
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    {{ form.address }}
+                                </div>
+                            </div>
+                            <!--REGION-->
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>State / Province</label>
+                                    <label>Region</label>
                                     {{ form.state }}
                                 </div>
                             </div>
+                            <!--ZIP-->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Zip / Postal Code</label>
                                     {{ form.zip }}
                                 </div>
                             </div>
-
+                            <!--EMAIL-->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Email Address</label>
                                     {{ form.email }}
                                 </div>
                             </div>
+                            <!--PHONE-->
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Phone Number</label>
@@ -101,7 +102,6 @@
                                 <div class="form-group">
                                     <div class="radio">
                                         <label><input type="radio" name="optradio"> Create an Account? </label>
-                                        <label><input type="radio" name="optradio"> Ship to different address</label>
                                     </div>
                                 </div>
                             </div>
@@ -115,15 +115,9 @@
                             <div class="cart-detail">
                                 <h2>Cart Total</h2>
                                 <ul>
-                                    <li>
-                                        <span>Subtotal</span> <span>$100.00</span>
-                                        <ul>
-                                            <li><span>1 x Product Name</span> <span>$99.00</span></li>
-                                            <li><span>1 x Product Name</span> <span>$78.00</span></li>
-                                        </ul>
-                                    </li>
-                                    <li><span>Shipping</span> <span>$0.00</span></li>
-                                    <li><span>Order Total</span> <span>$180.00</span></li>
+                                    <li><span>Subtotal:</span> <span>${{ get_total_all_products_price }}</span></li>
+                                    <li><span>Delivery:</span> <span>${{ delivery_price }}</span></li>
+                                    <li><span>Total:</span> <span>${{ get_final_order_products_price }}</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -136,14 +130,7 @@
                                 <div class="form-group">
                                     <div class="col-md-12">
                                         <div class="radio">
-                                            <label><input type="radio" name="optradio"> Direct Bank Tranfer</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <div class="radio">
-                                            <label><input type="radio" name="optradio"> Check Payment</label>
+                                            <label><input type="radio" name="optradio"> Stripe</label>
                                         </div>
                                     </div>
                                 </div>
@@ -167,14 +154,16 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12 text-center">
-                            <p><a href="#" class="btn btn-primary">Place an order</a></p>
+                            <p><a href="{% url 'orders:payment' %}" class="btn btn-primary">Place an order</a></p>
                         </div>
+<!--                        <form action="/create-checkout-session" method="POST">-->
+<!--                            <button type="submit" id="checkout-button">Checkout</button>-->
+<!--                        </form>-->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     {% include 'include/footer.html' %}
 </div>
 

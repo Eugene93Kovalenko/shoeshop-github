@@ -1,8 +1,10 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.views import generic
 
+from orders.cart import Cart
 from orders.forms import CheckoutForm
 from orders.models import *
 from products.models import Product
@@ -15,18 +17,18 @@ class CartView(generic.ListView):
     def get_queryset(self):
         return OrderItem.objects.filter(user=self.request.user).order_by('-created_at')
 
+    def get_total_all_products_price(self):
+        total_products_price = 0
+        for item in self.get_queryset():
+            total_products_price += item.get_total_product_price()
+        return total_products_price
+
     def get_total_discount(self):
         total_discount = 0
         for item in self.get_queryset():
             if item.product_variation.product.discount_price:
                 total_discount += item.product_variation.product.price * item.quantity - item.product_variation.product.discount_price * item.quantity
         return total_discount
-
-    def get_total_all_products_price(self):
-        total_products_price = 0
-        for item in self.get_queryset():
-            total_products_price += item.get_total_product_price()
-        return total_products_price
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,13 +85,18 @@ class RemoveFromCartView(generic.View):
         return redirect("orders:cart")
 
 
-class CheckoutView(generic.FormView):
+class CheckoutView(CartView, generic.FormView):
     template_name = "orders/checkout.html"
     form_class = CheckoutForm
     # success_url = reverse("orders:order-complete", kwargs={})
 
-    def get_success_url(self) -> str:
+    def get_success_url(self):
         return reverse("orders:payment")
+
+    # def get_context_data(self, *, object_list=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     return context
+
 
     # def form_valid(self, form):
     #     order = get_or_set_order_session(self.request)
@@ -139,9 +146,37 @@ class CheckoutView(generic.FormView):
     #     context["order"] = get_or_set_order_session(self.request)
     #     return context
 
+class PaymentView(generic.TemplateView):
+    template_name = "orders/payment.html"
+
 
 class OrderCompleteView(generic.TemplateView):
     template_name = "orders/order-complete.html"
+
+
+def cart_add(request):
+    cart = Cart(request)
+
+    if request.POST.get('action') == 'post':
+        product_id = int(request.POST.get('product_id'))
+        product_qty = int(request.POST.get('product_qty'))
+        product = get_object_or_404(Product, id=product_id)
+        cart.add(product=product, quantity=product_qty)
+        cart_qty = cart.__len__()
+        response = JsonResponse({'qty': cart_qty, "product": product.title})
+        return response
+
+
+def cart_delete(request):
+    cart = Cart(request)
+
+    if request.POST.get('action') == 'post':
+        product_id = int(request.POST.get('product_id'))
+        cart.delete(product=product_id)
+        cart_qty = cart.__len__()
+        cart_total = cart.get_total_price()
+        response = JsonResponse({'qty': cart_qty, 'total': cart_total})
+        return response
 
 
 

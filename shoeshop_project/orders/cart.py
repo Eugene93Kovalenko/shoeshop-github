@@ -1,9 +1,9 @@
 from decimal import Decimal
-from products.models import Product
+from products.models import Product, ProductVariation
 
 
 class Cart:
-    def __init__(self, request) -> None:
+    def __init__(self, request):
         self.session = request.session
         cart = self.session.get('session_key')
         if not cart:
@@ -11,26 +11,27 @@ class Cart:
         self.cart = cart
 
     def __len__(self):
-        return sum(item['qty'] for item in self.cart.values())
+        return sum(item['quantity'] for item in self.cart.values())
 
     def __iter__(self):
-        product_ids = self.cart.keys()
-        products = Product.objects.filter(id__in=product_ids)
+        product_variation_ids = self.cart.keys()
+        product_variations = ProductVariation.objects.filter(id__in=product_variation_ids)
         cart = self.cart.copy()
 
-        for product in products:
-            cart[str(product.id)]['product'] = product
+        for product in product_variations:
+            cart[str(product.id)]['product_variation'] = product
 
         for item in cart.values():
             item['price'] = Decimal(item['price'])
-            item['total'] = item['price'] * item['qty']
+            item['total'] = item['price'] * item['quantity']
             yield item
 
-    def add(self, product, quantity):
-        product_id = str(product.id)
+    def add(self, product_variation, quantity):
+        product_id = str(product_variation.id)
         if product_id not in self.cart:
-            self.cart[product_id] = {'qty': quantity, 'price': str(product.price)}
-        self.cart[product_id]['qty'] = quantity
+            self.cart[product_id] = {'product_id': product_variation.product.name, 'quantity': quantity, 'price': str(
+                product_variation.product.price)}
+        self.cart[product_id]['quantity'] = quantity
         self.session.modified = True
 
     def delete(self, product):
@@ -42,8 +43,8 @@ class Cart:
     def update(self, product, quantity):
         product_id = str(product)
         if product_id in self.cart:
-            self.cart[product_id]['qty'] = quantity
+            self.cart[product_id]['quantity'] = quantity
             self.session.modified = True
 
     def get_total_price(self):
-        return sum(Decimal(item['price']) * item['qty'] for item in self.cart.values())
+        return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())

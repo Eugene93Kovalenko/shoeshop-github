@@ -43,7 +43,8 @@
 									(74 Rating)
 								</span>
                         <p>{{ product.description }}</p>
-                        <form action="{{ product.get_add_to_cart_url }}" method="get">
+                        <form action="{{ product.get_add_to_cart_url }}" method="post">
+                            {% csrf_token %}
                             <div class="size-wrap">
                                 <div class="block-26 mb-2">
                                     <h4>Size</h4>

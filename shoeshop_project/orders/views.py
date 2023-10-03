@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views import generic
 
@@ -10,12 +10,25 @@ from orders.models import *
 from products.models import Product
 
 
+def cart_v(request):
+    cart = Cart(request)
+    # print(cart.keys())
+    # for i in cart:
+    #     print(i)
+    context = {
+        'cart_items': cart,
+    }
+    return render(request, "orders/cart.html", context)
+
+
 class CartView(generic.ListView):
     template_name = "orders/cart.html"
     context_object_name = 'cart_items'
 
     def get_queryset(self):
-        return OrderItem.objects.filter(user=self.request.user).order_by('-created_at')
+        cart = Cart(self.request)
+        # return OrderItem.objects.filter(user=self.request.user).order_by('-created_at')
+        return cart
 
     def get_total_all_products_price(self):
         total_products_price = 0
@@ -32,15 +45,43 @@ class CartView(generic.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["get_total_discount"] = self.get_total_discount()
-        context["get_total_all_products_price"] = self.get_total_all_products_price()
-        context["count_cart_items"] = OrderItem.objects.filter(user=self.request.user).count()
-        if OrderItem.objects.filter(user=self.request.user, ordered=False):
-            context["delivery_price"] = Order.objects.filter(user=self.request.user, ordered=False)[0].delivery_price
-        else:
-            context["delivery_price"] = 0.00
-        context["get_final_order_products_price"] = context["get_total_all_products_price"] + context["delivery_price"]
+        # context["get_total_discount"] = self.get_total_discount()
+        # context["get_total_all_products_price"] = self.get_total_all_products_price()
+        # context["count_cart_items"] = OrderItem.objects.filter(user=self.request.user).count()
+        # if OrderItem.objects.filter(user=self.request.user, ordered=False):
+        #     context["delivery_price"] = Order.objects.filter(user=self.request.user, ordered=False)[0].delivery_price
+        # else:
+        #     context["delivery_price"] = 0.00
+        # context["get_final_order_products_price"] = context["get_total_all_products_price"] + context["delivery_price"]
         return context
+
+
+def cart_add(request, slug):
+    cart = Cart(request)
+
+    if request.method == 'POST':
+        quantity = int(request.POST.get('quantity'))
+        size = request.POST.get('product-size')
+        product_variation = get_object_or_404(ProductVariation, product__slug=slug, size__name=size)
+        if product_variation.quantity < quantity:
+            raise ValueError('На складе нет этого товара в таком количестве')
+        cart.add(product_variation=product_variation, quantity=quantity)
+        # cart_quantity = cart.__len__()
+        # response = JsonResponse({'quantity': cart_quantity, "product_variation": product_variation.product.name})
+        # return response
+        return redirect("orders:cart")
+
+
+def cart_delete(request):
+    cart = Cart(request)
+
+    if request.POST.get('action') == 'post':
+        product_id = int(request.POST.get('product_id'))
+        cart.delete(product=product_id)
+        cart_qty = cart.__len__()
+        cart_total = cart.get_total_price()
+        response = JsonResponse({'qty': cart_qty, 'total': cart_total})
+        return response
 
 
 def add_to_cart(request, slug):
@@ -154,29 +195,7 @@ class OrderCompleteView(generic.TemplateView):
     template_name = "orders/order-complete.html"
 
 
-def cart_add(request):
-    cart = Cart(request)
 
-    if request.POST.get('action') == 'post':
-        product_id = int(request.POST.get('product_id'))
-        product_qty = int(request.POST.get('product_qty'))
-        product = get_object_or_404(Product, id=product_id)
-        cart.add(product=product, quantity=product_qty)
-        cart_qty = cart.__len__()
-        response = JsonResponse({'qty': cart_qty, "product": product.title})
-        return response
-
-
-def cart_delete(request):
-    cart = Cart(request)
-
-    if request.POST.get('action') == 'post':
-        product_id = int(request.POST.get('product_id'))
-        cart.delete(product=product_id)
-        cart_qty = cart.__len__()
-        cart_total = cart.get_total_price()
-        response = JsonResponse({'qty': cart_qty, 'total': cart_total})
-        return response
 
 
 

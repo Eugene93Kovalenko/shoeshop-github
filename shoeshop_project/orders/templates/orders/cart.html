@@ -35,32 +35,31 @@
                     <h1 class="text-center text-muted">You haven't added items to your cart yet</h1>
                     {% else %}
                     {% for item in cart_items %}
-                    {% with product_variation=item.product_variation %}
                     <div class="product-cart d-flex">
                         <div class="one-forth">
                             <div class="product-img">
-                                <a href="{{ product_variation.product.get_absolute_url }}">
-                                    <img src="{{ product_variation.product.images.first.get_absolute_url }}" alt=""
+                                <a href="{{ item.product_variation.product.get_absolute_url }}">
+                                    <img src="{{ item.product_variation.product.images.first.get_absolute_url }}" alt=""
                                          style="width: 100px;"></a>
                             </div>
                             <div class="display-tc">
                                 <a href="{{ item.product_variation.product.get_absolute_url }}">
-                                    <h3>{{ product_variation.product.name }}</h3></a>
+                                    <h3>{{ item.product_variation.product.name }}</h3></a>
                             </div>
                         </div>
                         <div class="one-eight text-center">
                             <div class="display-tc">
                                 <input type="text" id="size" name="size"
                                        class="form-control input-number text-center"
-                                       value="{{ product_variation.size }}">
+                                       value="{{ item.product_variation.size }}">
                             </div>
                         </div>
                         <div class="one-eight text-center">
                             <div class="display-tc">
-                                {% if product_variation.product.discount_price %}
-                                <span class="price">${{ product_variation.product.discount_price }}</span>
+                                {% if item.product_variation.product.discount_price %}
+                                <span class="price">${{ item.product_variation.product.discount_price }}</span>
                                 {% else %}
-                                <span class="price">${{ product_variation.product.price }}</span>
+                                <span class="price">${{ item.product_variation.product.price }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -73,10 +72,11 @@
                         </div>
                         <div class="one-eight text-center">
                             <div class="display-tc">
-                                <span class="price">${{ item.get_total_product_price }}</span>
+                                <span class="price">${{ item.total }}</span>
                             </div>
                         </div>
-                        <form action="{{ item.get_remove_from_cart_url }}" method="get">
+                        <form action="{{ item.product_variation.product.get_remove_from_cart_url }}" method="post">
+                            {% csrf_token %}
                             <input type="hidden" name="size" value="{{ item.product_variation.size }}">
                             <div class="one-eight text-center">
                                 <div class="display-tc">
@@ -85,7 +85,6 @@
                             </div>
                         </form>
                     </div>
-                    {% endwith %}
                     {% endfor %}
                     {% endif %}
                 </div>
@@ -110,9 +109,10 @@
                             <div class="col-sm-4 text-center">
                                 <div class="total">
                                     <div class="sub">
-                                        <p><span>Subtotal:</span> <span>${{ get_total_all_products_price }}</span></p>
+                                        <p><span>Subtotal:</span>
+                                            <span>${{ cart.get_total_all_products_price }}</span></p>
                                         <p><span>Delivery:</span> <span>${{ delivery_price }}</span></p>
-                                        <p><span>Discount:</span> <span>${{ get_total_discount }}</span></p>
+<!--                                        <p><span>Discount:</span> <span>${{ get_total_discount }}</span></p>-->
                                     </div>
                                     <div class="grand-total">
                                         <p><span><strong>Total:</strong></span> <span>${{ get_final_order_products_price }}</span>

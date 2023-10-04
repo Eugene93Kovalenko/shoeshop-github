@@ -71,6 +71,11 @@
                                     <i class="icon-plus2"></i>
                                 </button>
                             </div>
+                            <p>
+                                {% for message in messages%}
+                                {{ message }}
+                                {% endfor %}
+                            </p>
                             <div class="row">
                                 <div class="row col-sm-12 text-center">
                                     <p class="addtocart">

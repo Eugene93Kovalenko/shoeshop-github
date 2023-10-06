@@ -35,7 +35,7 @@
                         <li><a href="{% url 'products:about' %}">About</a></li>
                         <li><a href="{% url 'products:contact' %}">Contact</a></li>
                         <li class="cart"><a href="{% url 'orders:cart' %}"><i class="icon-shopping-cart"></i> Cart
-                            [{{ count_cart_items }}]</a></li>
+                            [{{ cart|length }}]</a></li>
                         {% if user.is_authenticated %}
                         <li class="cart"><a href="{% url 'accounts:logout' %}">Sign Out</a></li>
                         {% else %}
@@ -49,6 +49,7 @@
     </div>
 </nav>
 
+      {{ cart }}
 <style>
     $(function() {
   $('nav a[href^="/' + location.pathname.split("/")[1] + '"]').addClass('active');

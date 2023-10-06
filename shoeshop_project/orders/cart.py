@@ -7,9 +7,7 @@ from products.models import ProductVariation
 class Cart:
     def __init__(self, request):
         self.session = request.session
-        cart = self.session.get(settings.CART_SESSION_ID)
-        if not cart:
-            cart = self.session[settings.CART_SESSION_ID] = {}
+        cart = self.session.setdefault(settings.CART_SESSION_ID, {})
         self.cart = cart
 
     def __len__(self):
@@ -31,7 +29,6 @@ class Cart:
     def add(self, product_variation, quantity, user):
         product_variation_id = str(product_variation.id)
         if product_variation_id not in self.cart:
-            print('not in cart')
             if product_variation.product.discount_price:
                 self.cart[product_variation_id] = {'quantity': quantity,
                                                    'price': str(product_variation.product.discount_price),
@@ -51,13 +48,17 @@ class Cart:
             self.save()
 
     def save(self):
+        self.session[settings.CART_SESSION_ID] = self.cart
         self.session.modified = True
 
     def get_total_all_products_price(self):
         return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
 
-    # @staticmethod
-    # def get_final_order_price():
-    #     pass
+    def get_delivery_price(self):
+        return Decimal(50.00)
+
+    def get_final_order_price(self):
+        return self.get_total_all_products_price() + self.get_delivery_price()
+
 
 

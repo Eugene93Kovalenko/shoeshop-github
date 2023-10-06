@@ -10,7 +10,6 @@ from django.views.decorators.http import require_POST
 from orders.cart import Cart
 from orders.forms import CheckoutForm
 from orders.models import *
-from products.models import Product
 
 
 class CartView(generic.ListView):
@@ -21,25 +20,10 @@ class CartView(generic.ListView):
         cart = Cart(self.request)
         return cart
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['delivery_price'] = 50.00
-        # context['get_total_all_products_price'] = self.get_total_all_products_price()
-        # context["get_total_discount"] = self.get_total_discount()
-        # context["get_total_all_products_price"] = self.get_total_all_products_price()
-        # context["count_cart_items"] = OrderItem.objects.filter(user=self.request.user).count()
-        # if OrderItem.objects.filter(user=self.request.user, ordered=False):
-        #     context["delivery_price"] = Order.objects.filter(user=self.request.user, ordered=False)[0].delivery_price
-        # else:
-        #     context["delivery_price"] = 0.00
-        # context["get_final_order_products_price"] = context["get_total_all_products_price"] + context["delivery_price"]
-        return context
-
 
 @require_POST
-def cart_add(request, slug):
+def add_to_cart(request, slug):
     cart = Cart(request)
-    # if request.method == 'POST':
     if request.POST.get('quantity') == '0' or not request.POST.get('product-size'):
         messages.warning(request, "Вы должны выбрать размер и количество товара")
         return redirect(request.META.get('HTTP_REFERER'))
@@ -53,7 +37,7 @@ def cart_add(request, slug):
     return redirect("orders:cart")
 
 
-def cart_delete(request, slug):
+def remove_from_cart(request, slug):
     cart = Cart(request)
     if request.method == 'POST':
         size = request.POST.get('size')

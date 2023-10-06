@@ -42,7 +42,7 @@
 									<i class="icon-star-half"></i>
 									(74 Rating)
 								</span>
-                        <p>{{ product.description }}</p>
+                        <p>{{ product.description}}</p>
                         <form action="{{ product.get_add_to_cart_url }}" method="post">
                             {% csrf_token %}
                             <div class="size-wrap">

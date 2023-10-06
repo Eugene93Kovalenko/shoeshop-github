@@ -32,7 +32,7 @@
                         </div>
                     </div>
                     {% if not cart_items %}
-                    <h1 class="text-center text-muted">You haven't added items to your cart yet</h1>
+                    <h1 class="text-center text-muted">Your cart is currently empty</h1>
                     {% else %}
                     {% for item in cart_items %}
                     <div class="product-cart d-flex">
@@ -64,10 +64,17 @@
                             </div>
                         </div>
                         <div class="one-eight text-center">
+
                             <div class="display-tc">
+<!--                                <button class="btn btn-sm btn-primary btn-plus" data-type="plus" data-field="">-->
+<!--                                <i class="icon-minus2"></i>-->
+<!--                                </button>-->
                                 <input type="text" id="quantity" name="quantity"
                                        class="form-control input-number text-center"
                                        value="{{ item.quantity }}" min="1" max="100">
+<!--                                <button class="btn btn-sm btn-primary btn-minus" data-type="minus" data-field="">-->
+<!--                                <i class="fas fa-caret-up"></i>-->
+<!--                                </button>-->
                             </div>
                         </div>
                         <div class="one-eight text-center">
@@ -111,11 +118,11 @@
                                     <div class="sub">
                                         <p><span>Subtotal:</span>
                                             <span>${{ cart.get_total_all_products_price }}</span></p>
-                                        <p><span>Delivery:</span> <span>${{ delivery_price }}</span></p>
+                                        <p><span>Delivery:</span> <span>${{ cart.get_delivery_price }}</span></p>
 <!--                                        <p><span>Discount:</span> <span>${{ get_total_discount }}</span></p>-->
                                     </div>
                                     <div class="grand-total">
-                                        <p><span><strong>Total:</strong></span> <span>${{ get_final_order_products_price }}</span>
+                                        <p><span><strong>Total:</strong></span> <span>${{ cart.get_final_order_price }}</span>
                                         </p>
                                     </div>
                                 </div>

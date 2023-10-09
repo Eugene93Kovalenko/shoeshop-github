@@ -91,7 +91,7 @@ class ShippingAddress(models.Model):
 
 
 class Payment(models.Model):
-    stripe_charge_id = models.CharField(max_length=50)
+    stripe_charge_id = models.CharField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.SET_NULL, blank=True, null=True)
     amount = models.FloatField()
@@ -101,6 +101,6 @@ class Payment(models.Model):
         verbose_name = 'Оплата'
         verbose_name_plural = 'Оплаты'
 
-    def __str__(self):
-        return self.user.name
+    # def __str__(self):
+    #     return self.user
 

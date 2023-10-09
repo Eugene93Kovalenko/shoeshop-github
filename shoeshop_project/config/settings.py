@@ -21,6 +21,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 CART_SESSION_ID = 'cart'
 
+BACKEND_DOMAIN = "http://127.0.0.1:8000"
+
+PAYMENT_SUCCESS_URL = 'http://127.0.0.1:8000/success/'
+PAYMENT_CANCEL_URL = 'http://127.0.0.1:8000/cancel/'
+
+STRIPE_PUBLIC_KEY = \
+    'pk_test_51NtBRsEHgFzglP9yWCayky7DXIohqd82LZaU7kH9P8VtBYhftLhSr7Se2WDVPcdiXtd8oEWcqy0K0hHaTM52oeqD009R6bWUBK'
+
+STRIPE_SECRET_KEY = \
+    'sk_test_51NtBRsEHgFzglP9yIL1zTu15lN9oVvsOdcVVRLhGX6ASt0Dg4lsTCCq3LAWcDPHYMXflH68kXPpvQkyUrM5Cogvj0002CBOu7Z'
+
+STRIPE_WEBHOOK_SECRET = 'whsec_6b93d183453a6827a2fe99fa67b951d1a33aef6183395e67062d15849155e590'
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-hk@_ob#xryi7xtj57$(lsfb%mx+2q84l4v@g+9fe8nk1nasd+g'
 
@@ -47,9 +62,6 @@ INSTALLED_APPS = [
     'django_filters',
     'django_countries',
     'crispy_forms',
-
-    'allauth',
-    'allauth.account',
 ]
 
 MIDDLEWARE = [
@@ -60,8 +72,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -123,10 +133,8 @@ DATABASES = {
 AUTH_USER_MODEL = "accounts.CustomUser"
 
 AUTHENTICATION_BACKENDS = [
-    # 'accounts.backends.EmailAuthBackend',
+    'accounts.backends.EmailAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
-
-    # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 LOGIN_REDIRECT_URL = '/'
@@ -163,4 +171,4 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-SITE_ID = 1
+

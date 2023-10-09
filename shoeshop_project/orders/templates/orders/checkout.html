@@ -115,9 +115,9 @@
                             <div class="cart-detail">
                                 <h2>Cart Total</h2>
                                 <ul>
-                                    <li><span>Subtotal:</span> <span>${{ get_total_all_products_price }}</span></li>
-                                    <li><span>Delivery:</span> <span>${{ delivery_price }}</span></li>
-                                    <li><span>Total:</span> <span>${{ get_final_order_products_price }}</span></li>
+                                    <li><span>Subtotal:</span> <span>${{ cart.get_total_all_products_price }}</span></li>
+                                    <li><span>Delivery:</span> <span>${{ cart.get_delivery_price }}</span></li>
+                                    <li><span>Total:</span> <span>${{ cart.get_final_order_price }}</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -153,12 +153,13 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12 text-center">
-                            <p><a href="{% url 'orders:payment' %}" class="btn btn-primary">Place an order</a></p>
-                        </div>
-<!--                        <form action="/create-checkout-session" method="POST">-->
-<!--                            <button type="submit" id="checkout-button">Checkout</button>-->
-<!--                        </form>-->
+<!--                        <div class="col-md-12 text-center">-->
+<!--                            <p><a href="{% url 'orders:create-checkout-session' %}" class="btn btn-primary">Place an order</a></p>-->
+<!--                        </div>-->
+                        <form action="{% url 'orders:create-checkout-session' %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" id="checkout-button">Place an order</button>
+                        </form>
                     </div>
                 </div>
             </div>

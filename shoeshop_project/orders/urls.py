@@ -10,5 +10,9 @@ urlpatterns = [
     path('remove_from_cart/<slug:slug>', remove_from_cart, name='remove-from-cart'),
     path('cart/checkout/', CheckoutView.as_view(), name='checkout'),
     path('cart/checkout/payment', PaymentView.as_view(), name='payment'),
+    path("create-checkout-session/", CreateStripeCheckoutSessionView.as_view(), name="create-checkout-session"),
     path('order_complete/', OrderCompleteView.as_view(), name='order-complete'),
+    path('success/', SuccessView.as_view(), name='success'),
+    path('cancel/', CancelView.as_view(), name='cancel'),
+    path("webhooks/stripe/", StripeWebhookView.as_view(), name="stripe-webhook"),
 ]

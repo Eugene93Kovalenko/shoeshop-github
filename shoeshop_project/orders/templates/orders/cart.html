@@ -56,11 +56,7 @@
                         </div>
                         <div class="one-eight text-center">
                             <div class="display-tc">
-                                {% if item.product_variation.product.discount_price %}
-                                <span class="price">${{ item.product_variation.product.discount_price }}</span>
-                                {% else %}
-                                <span class="price">${{ item.product_variation.product.price }}</span>
-                                {% endif %}
+                                <span class="price">${{ item.price }}</span>
                             </div>
                         </div>
                         <div class="one-eight text-center">

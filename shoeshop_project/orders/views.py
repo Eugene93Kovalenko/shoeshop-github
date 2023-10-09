@@ -1,12 +1,17 @@
 from decimal import Decimal
 
+import stripe
 from django.contrib import messages
-from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from accounts.models import CustomUser
 from orders.cart import Cart
 from orders.forms import CheckoutForm
 from orders.models import *
@@ -17,8 +22,10 @@ class CartView(generic.ListView):
     context_object_name = 'cart_items'
 
     def get_queryset(self):
-        cart = Cart(self.request)
-        return cart
+        # cart = Cart(self.request)
+        # print(cart)
+        # print(list(Cart(self.request)))
+        return Cart(self.request)
 
 
 @require_POST
@@ -30,11 +37,12 @@ def add_to_cart(request, slug):
     quantity = int(request.POST.get('quantity'))
     size = request.POST.get('product-size')
     product_variation = get_object_or_404(ProductVariation, product__slug=slug, size__name=size)
+    # product_variation = ProductVariation.objects.filter(product__slug=slug, size__name=size)
     if product_variation.quantity < quantity:
         messages.warning(request, "На складе нет этого товара в таком количестве")
         return redirect(request.META.get('HTTP_REFERER'))
     cart.add(product_variation=product_variation, quantity=quantity, user=request.user.username)
-    return redirect("orders:cart")
+    return redirect("products:home")
 
 
 def remove_from_cart(request, slug):
@@ -46,51 +54,10 @@ def remove_from_cart(request, slug):
         return redirect("orders:cart")
 
 
-# def add_to_cart(request, slug):
-#     if request.GET.get('quantity') == '0':
-#         return redirect(request.META.get('HTTP_REFERER'))
-#     quantity = int(request.GET.get('quantity'))
-#     size = request.GET.get('product-size')
-#     product_variation = get_object_or_404(ProductVariation, product__slug=slug, size__name=size)
-#     if product_variation.quantity < quantity:
-#         raise ValueError('На складе нет этого товара в таком количестве')
-#     order_item, created = OrderItem.objects.get_or_create(
-#         user=request.user,
-#         product_variation=product_variation
-#     )
-#     order_qs = Order.objects.filter(user=request.user, ordered=False)
-#     if order_qs.exists():
-#         order = order_qs[0]
-#         if order.products.filter(product_variation__product__slug=slug,
-#                                  product_variation__size__name=size).exists():
-#             order_item.quantity += quantity
-#             order_item.save()
-#             return redirect("orders:cart")
-#         else:
-#             order.products.add(order_item)
-#             return redirect("orders:cart")
-#     else:
-#         order = Order.objects.create(
-#             user=request.user, ordered_date=timezone.now())
-#         order.products.add(order_item)
-#         return redirect("orders:cart")
-
-
-# class RemoveFromCartView(generic.View):
-#     @staticmethod
-#     def get(request, *args, **kwargs):
-#         size = request.GET.get('size')
-#         product_variation = get_object_or_404(ProductVariation, product__slug=kwargs['slug'], size__name=size)
-#         order_item = get_object_or_404(OrderItem, product_variation=product_variation,
-#                                        user=request.user,
-#                                        ordered=False)
-#         order_item.delete()
-#         return redirect("orders:cart")
-
-
 class CheckoutView(CartView, generic.FormView):
     template_name = "orders/checkout.html"
     form_class = CheckoutForm
+
     # success_url = reverse("orders:order-complete", kwargs={})
 
     def get_success_url(self):
@@ -99,7 +66,6 @@ class CheckoutView(CartView, generic.FormView):
     # def get_context_data(self, *, object_list=None, **kwargs):
     #     context = super().get_context_data(**kwargs)
     #     return context
-
 
     # def form_valid(self, form):
     #     order = get_or_set_order_session(self.request)
@@ -139,15 +105,16 @@ class CheckoutView(CartView, generic.FormView):
     #     messages.info(self.request, "You have successfully added your addresses")
     #     return super(CheckoutView, self).form_valid(form)
     #
-    # def get_form_kwargs(self) -> Dict[str, Any]:
+    # def get_form_kwargs(self):
     #     kwargs = super(CheckoutView, self).get_form_kwargs()
     #     kwargs["user_id"] = self.request.user.id
     #     return kwargs
     #
-    # def get_context_data(self, **kwargs) -> Dict[str, Any]:
+    # def get_context_data(self, **kwargs):
     #     context = super(CheckoutView, self).get_context_data(**kwargs)
     #     context["order"] = get_or_set_order_session(self.request)
     #     return context
+
 
 class PaymentView(generic.TemplateView):
     template_name = "orders/payment.html"
@@ -157,7 +124,92 @@ class OrderCompleteView(generic.TemplateView):
     template_name = "orders/order-complete.html"
 
 
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
+class CreateStripeCheckoutSessionView(generic.View):
+    def post(self, request):
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=self.get_line_items_list(),
+            mode='payment',
+            success_url=settings.PAYMENT_SUCCESS_URL,
+            cancel_url=settings.PAYMENT_CANCEL_URL,
+            customer_email=self.get_user_email()
+        )
+        print(checkout_session.id)
+        return redirect(checkout_session.url)
+
+    def get_user_email(self):
+        if self.request.user.is_authenticated:
+            return self.request.user.email
+
+    def get_line_items_list(self):
+        cart = Cart(self.request)
+        line_items_list = []
+        for item in cart:
+            line_items_list.append(
+                {
+                    'price_data': {
+                        'currency': 'usd',
+                        'unit_amount': int(item['price']) * 100,
+                        'product_data': {
+                            'name': item['product_variation'].product.name
+                        },
+                    },
+                    'quantity': item['quantity'],
+                }
+            )
+        return line_items_list
 
 
+class SuccessView(generic.TemplateView):
+    template_name = "orders/success.html"
+
+
+class CancelView(generic.TemplateView):
+    template_name = "orders/cancel.html"
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class StripeWebhookView(generic.View):
+    """
+    Stripe webhook view to handle checkout session completed event.
+    """
+    def post(self, request, format=None):
+        payload = request.body
+        endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+        sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
+        event = None
+
+        try:
+            event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+        except ValueError as e:
+            # Invalid payload
+            return HttpResponse(status=400)
+        except stripe.error.SignatureVerificationError as e:
+            # Invalid signature
+            return HttpResponse(status=400)
+
+        if event["type"] == "checkout.session.completed":
+            print("Payment successful")
+
+            session = event["data"]["object"]
+            customer_email = session["customer_details"]["email"]
+            amount = session['amount_total']
+
+            send_mail(
+                subject="Shoeshop purchase",
+                message="New purchase!",
+                recipient_list=[customer_email],
+                from_email="test@email.com",
+            )
+            user = CustomUser.objects.get(email=customer_email)
+            Payment.objects.create(
+                stripe_charge_id=session['id'],
+                user=user,
+                amount=amount / 100,
+            )
+
+        # Can handle other events here.
+        return HttpResponse(status=200)

@@ -133,16 +133,19 @@ class CreateStripeCheckoutSessionView(generic.View):
             payment_method_types=['card'],
             line_items=self.get_line_items_list(),
             mode='payment',
+            metadata=self.get_metadata(),
             success_url=settings.PAYMENT_SUCCESS_URL,
             cancel_url=settings.PAYMENT_CANCEL_URL,
             customer_email=self.get_user_email()
         )
-        print(checkout_session.id)
         return redirect(checkout_session.url)
 
-    def get_user_email(self):
-        if self.request.user.is_authenticated:
-            return self.request.user.email
+    def get_metadata(self):
+        cart = Cart(self.request)
+        metadata = {}
+        for item in cart:
+            metadata[item['product_variation'].id] = item['quantity']
+        return metadata
 
     def get_line_items_list(self):
         cart = Cart(self.request)
@@ -161,6 +164,10 @@ class CreateStripeCheckoutSessionView(generic.View):
                 }
             )
         return line_items_list
+
+    def get_user_email(self):
+        if self.request.user.is_authenticated:
+            return self.request.user.email
 
 
 class SuccessView(generic.TemplateView):
@@ -193,23 +200,24 @@ class StripeWebhookView(generic.View):
 
         if event["type"] == "checkout.session.completed":
             print("Payment successful")
-
             session = event["data"]["object"]
             customer_email = session["customer_details"]["email"]
             amount = session['amount_total']
-
-            send_mail(
-                subject="Shoeshop purchase",
-                message="New purchase!",
-                recipient_list=[customer_email],
-                from_email="test@email.com",
-            )
             user = CustomUser.objects.get(email=customer_email)
+            ordered_date = timezone.now()
+            order = Order.objects.create(
+                user=user, ordered_date=ordered_date, ordered=True)
+            for key, value in session['metadata'].items():
+                order_item = OrderItem.objects.create(user=user,
+                                                      product_variation=ProductVariation.objects.get(id=key),
+                                                      quantity=value,
+                                                      ordered=True
+                                                      )
+                order.products.add(order_item)
             Payment.objects.create(
                 stripe_charge_id=session['id'],
                 user=user,
+                order=order,
                 amount=amount / 100,
             )
-
-        # Can handle other events here.
         return HttpResponse(status=200)

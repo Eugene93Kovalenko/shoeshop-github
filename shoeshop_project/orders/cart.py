@@ -18,11 +18,7 @@ class Cart:
     def __iter__(self):
         product_variation_ids = self.cart.keys()
         product_variations = ProductVariation.objects.filter(id__in=product_variation_ids)
-        # cart = self.cart.copy()
         cart = self.cart
-        # car = cart
-        # for product_variation in product_variations:
-        #     car[str(product_variation.id)]['product_variation'] = product_variation
 
         for product_variation in product_variations:
             cart[str(product_variation.id)]['product_variation'] = product_variation
@@ -31,7 +27,6 @@ class Cart:
         for item in cart.values():
             item['price'] = Decimal(item['price'])
             item['total'] = item['price'] * item['quantity']
-            # print(type(item['product_variation']))
             yield item
 
     def add(self, product_variation, quantity, user):
@@ -40,13 +35,10 @@ class Cart:
             if product_variation.product.discount_price:
                 self.cart[product_variation_id] = {'quantity': quantity,
                                                    'price': str(product_variation.product.discount_price),
-                                                   # 'product_variation': product_variation,
                                                    'user': user}
-                # print(self.cart[product_variation_id])
             else:
                 self.cart[product_variation_id] = {'quantity': quantity,
                                                    'price': str(product_variation.product.price),
-                                                   # 'product_variation': product_variation,
                                                    'user': user}
         else:
             self.cart[product_variation_id]['quantity'] += quantity
@@ -58,8 +50,12 @@ class Cart:
             del self.cart[product_id]
             self.save()
 
+    def clear(self):
+        del self.session[settings.CART_SESSION_ID]
+        self.save()
+
     def save(self):
-        self.session[settings.CART_SESSION_ID] = self.cart
+        # self.session[settings.CART_SESSION_ID] = self.cart
         self.session.modified = True
 
     def get_total_all_products_price(self):

@@ -7,7 +7,9 @@ from products.models import *
 
 class OrderItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE,
+                             null=True,
+                             blank=True)
     product_variation = models.ForeignKey(ProductVariation, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     ordered = models.BooleanField(default=False)
@@ -32,7 +34,9 @@ class OrderItem(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE,
+                             null=True,
+                             blank=True)
     products = models.ManyToManyField(OrderItem)
     delivery_price = models.DecimalField(default=50, max_digits=7, decimal_places=2)
     start_date = models.DateTimeField(auto_now_add=True)
@@ -56,7 +60,9 @@ class Order(models.Model):
 
 
 class ShippingAddress(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             null=True)
     country = CountryField(multiple=False)
     city = models.CharField(max_length=100)
     zip = models.CharField(max_length=20)
@@ -74,7 +80,9 @@ class ShippingAddress(models.Model):
 class Payment(models.Model):
     stripe_charge_id = models.CharField(max_length=100)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.SET_NULL, blank=True, null=True)
+                             on_delete=models.SET_NULL,
+                             null=True,
+                             blank=True)
     order = models.ForeignKey(
         to=Order,
         on_delete=models.CASCADE,

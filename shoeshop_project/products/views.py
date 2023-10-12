@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
 
+from orders.cart import Cart
 from orders.models import OrderItem, Order
 from .filters import ProductFilter
 from .models import *
@@ -20,7 +21,6 @@ class HomeView(generic.ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context["count_cart_items"] = OrderItem.objects.filter(user=self.request.user).count()
         return context
 
 

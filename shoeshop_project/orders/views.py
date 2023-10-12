@@ -54,8 +54,6 @@ class CheckoutView(CartView, generic.FormView):
     template_name = "orders/checkout.html"
     form_class = CheckoutForm
 
-    # success_url = reverse("orders:order-complete", kwargs={})
-
     def get_success_url(self):
         return reverse("orders:payment")
 
@@ -119,11 +117,11 @@ class PaymentView(generic.TemplateView):
 class OrderCompleteView(generic.TemplateView):
     template_name = "orders/order-complete.html"
 
-
-def order_complete_view(request):
-    cart = Cart(request)
-    cart.clear()
-    return render(request, "orders/order-complete.html")
+    def get(self, request, *args, **kwargs):
+        cart = Cart(request)
+        cart.clear()
+        context = super().get_context_data(**kwargs)
+        return self.render_to_response(context)
 
 
 class CancelView(generic.TemplateView):
@@ -177,12 +175,11 @@ class CreateStripeCheckoutSessionView(generic.View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class StripeWebhookView(generic.View):
-    def post(self, request, format=None):
+    @staticmethod
+    def post(request):
         payload = request.body
         endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
         sig_header = request.META["HTTP_STRIPE_SIGNATURE"]
-        # event = None
-
         try:
             event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
         except ValueError as e:
@@ -244,8 +241,3 @@ def _handle_successful_payment(session):
             order=order,
             amount=amount / 100,
         )
-
-
-
-
-

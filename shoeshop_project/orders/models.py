@@ -64,6 +64,7 @@ class ShippingAddress(models.Model):
                              on_delete=models.CASCADE,
                              null=True)
     country = CountryField(multiple=False)
+    region = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     zip = models.CharField(max_length=20)
     address = models.CharField(max_length=150)

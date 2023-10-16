@@ -16,6 +16,7 @@ class CustomLoginView(LoginView):
 class RegisterView(CreateView):
     form_class = CustomUserCreationForm
     template_name = 'registration/registration.html'
+    success_url = reverse_lazy("products:home")
 
 
 class CustomPasswordChangeView(PasswordChangeView):

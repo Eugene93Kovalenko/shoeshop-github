@@ -3,7 +3,7 @@ from decimal import Decimal
 import stripe
 from django.contrib import messages
 from django.core.mail import send_mail
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -50,55 +50,56 @@ def remove_from_cart(request, slug):
         return redirect("orders:cart")
 
 
-class CheckoutView(CartView, generic.FormView):
+def checkout(request):
+    if request.method == 'POST':
+        print('-------------')
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data['phone'])
+            print(form.cleaned_data['accept_terms'])
+            return reverse("orders:create-checkout-session")
+    else:
+        form = CheckoutForm()
+
+    return render(request, 'orders/checkout.html', {'form': form})
+
+
+class CheckoutFormView(generic.FormView):
     template_name = "orders/checkout.html"
     form_class = CheckoutForm
+    # success_url = '/create-checkout-session/'
 
     def get_success_url(self):
-        return reverse("orders:payment")
+        return reverse('orders:create-checkout-session')
 
-    # def get_context_data(self, *, object_list=None, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     return context
+    def form_valid(self, form):
+        user = self.request.user
+        user.first_name = form.cleaned_data['first_name']
+        user.last_name = form.cleaned_data['last_name']
+        user.phone = form.cleaned_data['phone']
+        user.save()
+        if ShippingAddress.objects.get(user=user):
+            ShippingAddress.objects.update(
+                user=user,
+                country=form.cleaned_data['country'],
+                region=form.cleaned_data['region'],
+                city=form.cleaned_data['city'],
+                zip=form.cleaned_data['zip'],
+                address=form.cleaned_data['address'],
+                default=True
+            )
+        else:
+            ShippingAddress.objects.create(
+                user=user,
+                country=form.cleaned_data['country'],
+                region=form.cleaned_data['region'],
+                city=form.cleaned_data['city'],
+                zip=form.cleaned_data['zip'],
+                address=form.cleaned_data['address'],
+                default=True
+            )
+        return super(CheckoutFormView, self).form_valid(form)
 
-    # def form_valid(self, form):
-    #     order = get_or_set_order_session(self.request)
-    #     selected_shipping_address = form.cleaned_data.get(
-    #         'selected_shipping_address'
-    #     )
-    #     selected_billing_address = form.cleaned_data.get(
-    #         'selected_billing_address'
-    #     )
-    #     if selected_shipping_address:
-    #         order.shipping_address = selected_shipping_address
-    #     else:
-    #         address = Address.objects.create(
-    #             address_type=Address.SHIPPING_ADDRESS_TYPE,
-    #             user=self.request.user,
-    #             address_line_1=form.cleaned_data['shipping_address_line_1'],
-    #             address_line_2=form.cleaned_data['shipping_address_line_2'],
-    #             zip_code=form.cleaned_data['shipping_zip_code'],
-    #             city=form.cleaned_data['shipping_city'],
-    #         )
-    #         order.shipping_address = address
-    #
-    #     if selected_billing_address:
-    #         order.billing_address = selected_billing_address
-    #     else:
-    #         address = Address.objects.create(
-    #             address_type=Address.BILLING_ADDRESS_TYPE,
-    #             user=self.request.user,
-    #             address_line_1=form.cleaned_data['billing_address_line_1'],
-    #             address_line_2=form.cleaned_data['billing_address_line_2'],
-    #             zip_code=form.cleaned_data['billing_zip_code'],
-    #             city=form.cleaned_data['billing_city'],
-    #         )
-    #         order.billing_address = address
-    #
-    #     order.save()
-    #     messages.info(self.request, "You have successfully added your addresses")
-    #     return super(CheckoutView, self).form_valid(form)
-    #
     # def get_form_kwargs(self):
     #     kwargs = super(CheckoutView, self).get_form_kwargs()
     #     kwargs["user_id"] = self.request.user.id
@@ -110,28 +111,10 @@ class CheckoutView(CartView, generic.FormView):
     #     return context
 
 
-class PaymentView(generic.TemplateView):
-    template_name = "orders/payment.html"
-
-
-class OrderCompleteView(generic.TemplateView):
-    template_name = "orders/order-complete.html"
-
-    def get(self, request, *args, **kwargs):
-        cart = Cart(request)
-        cart.clear()
-        context = super().get_context_data(**kwargs)
-        return self.render_to_response(context)
-
-
-class CancelView(generic.TemplateView):
-    template_name = "orders/cancel.html"
-
-
 class CreateStripeCheckoutSessionView(generic.View):
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
-    def post(self, request):
+    def get(self, request):
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=self.get_line_items_list(),
@@ -241,3 +224,17 @@ def _handle_successful_payment(session):
             order=order,
             amount=amount / 100,
         )
+
+
+class OrderCompleteView(generic.TemplateView):
+    template_name = "orders/order-complete.html"
+
+    def get(self, request, *args, **kwargs):
+        cart = Cart(request)
+        cart.clear()
+        context = super().get_context_data(**kwargs)
+        return self.render_to_response(context)
+
+
+class CancelView(generic.TemplateView):
+    template_name = "orders/cancel.html"

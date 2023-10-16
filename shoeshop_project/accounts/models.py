@@ -36,25 +36,9 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
 
     email = models.EmailField(max_length=100, unique=True)
+    phone = models.CharField(max_length=30, null=True, blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
-
-
-# class ShippingAddress(models.Model):
-#     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True)
-#     order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
-#     country = models.CharField(max_length=150, null=True)
-#     city = models.CharField(max_length=150, null=True)
-#     address = models.CharField(max_length=200, null=True)
-#     zipcode = models.CharField(max_length=150, null=True)
-#     date_added = models.DateTimeField(auto_now_add=True)
-#
-#     class Meta:
-#         verbose_name = 'Адрес'
-#         verbose_name_plural = 'Адреса'
-#
-#     def __str__(self) -> str:
-#         return f"{self.zipcode}, {self.country}, {self.city}, {self.address}"

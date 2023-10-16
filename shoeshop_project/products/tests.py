@@ -1,5 +1,5 @@
 from django.test import TestCase
-
+from orders.forms import CheckoutForm
 # {
 #   "after_expiration": null,
 #   "allow_promotion_codes": null,
@@ -230,26 +230,28 @@ a = {
 #   metadata['product_info'][item['product_variation'].id] = item['quantity']
 
 
-SESSION1 = {
+# SESSION1 = {
+#
+#
+#
+#   "recovered_from": null,
+#   "setup_intent": null,
+#   "shipping_address_collection": null,
+#   "shipping_cost": null,
+#   "shipping_details": null,
+#   "shipping_options": [],
+#   "status": "complete",
+#   "submit_type": null,
+#   "subscription": null,
+#   "success_url": "http://127.0.0.1:8000/success/",
+#   "total_details": {
+#     "amount_discount": 0,
+#     "amount_shipping": 0,
+#     "amount_tax": 0
+#   },
+#   "url": null
+# }
 
 
-
-  "recovered_from": null,
-  "setup_intent": null,
-  "shipping_address_collection": null,
-  "shipping_cost": null,
-  "shipping_details": null,
-  "shipping_options": [],
-  "status": "complete",
-  "submit_type": null,
-  "subscription": null,
-  "success_url": "http://127.0.0.1:8000/success/",
-  "total_details": {
-    "amount_discount": 0,
-    "amount_shipping": 0,
-    "amount_tax": 0
-  },
-  "url": null
-}
 
 

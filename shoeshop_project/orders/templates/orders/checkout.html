@@ -9,160 +9,144 @@
     <div class="colorlib-product">
         <div class="container">
             {% include 'include/order_breadcrumbs.html' %}
-            <!--            <div class="row row-pb-lg">-->
-            <!--                <div class="col-sm-10 offset-md-1">-->
-            <!--                    <div class="process-wrap">-->
-            <!--                        <div class="process text-center active">-->
-            <!--                            <p><span>01</span></p>-->
-            <!--                            <h3>Shopping Cart</h3>-->
-            <!--                        </div>-->
-            <!--                        <div class="process text-center active">-->
-            <!--                            <p><span>02</span></p>-->
-            <!--                            <h3>Checkout</h3>-->
-            <!--                        </div>-->
-            <!--                        <div class="process text-center">-->
-            <!--                            <p><span>03</span></p>-->
-            <!--                            <h3>Order Complete</h3>-->
-            <!--                        </div>-->
-            <!--                    </div>-->
-            <!--                </div>-->
-            <!--            </div>-->
-            <div class="row">
-                <div class="col-lg-8">
-                    <!--                    FORM-->
-                    <form action="" method="post" class="colorlib-form">
-                        <h2>Shipping Details</h2>
+<!--            <form method="POST" action="{% url 'orders:create-checkout-session' %}">-->
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="colorlib-form">
+                            <h2>Shipping Details</h2>
+                            <div class="row">
+                                <!--FIRST NAME-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>First Name</label>
+                                        {{ form.first_name }}
+                                    </div>
+                                </div>
+                                <!--LAST NAME-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Last Name</label>
+                                        {{ form.last_name }}
+                                    </div>
+                                </div>
+                                <!--COUNTRY-->
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Select Country</label>
+                                        <div class="form-field">
+                                            {{ form.country }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--CITY-->
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Town / City</label>
+                                        {{ form.city }}
+                                    </div>
+                                </div>
+                                <!--ADDRESS-->
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Address</label>
+                                        {{ form.address }}
+                                    </div>
+                                </div>
+                                <!--REGION-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Region</label>
+                                        {{ form.region }}
+                                    </div>
+                                </div>
+                                <!--ZIP-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Zip / Postal Code</label>
+                                        {{ form.zip }}
+                                    </div>
+                                </div>
+                                <!--EMAIL-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email Address</label>
+                                        {{ form.email }}
+                                    </div>
+                                </div>
+                                <!--PHONE-->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Phone Number</label>
+                                        {{ form.phone }}
+                                    </div>
+                                </div>
+                                <!--CREATE_ACCOUNT-->
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <div class="radio">
+                                            {{ form.create_account }}
+                                            <label> Create an Account? </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
                         <div class="row">
-                            <!--FIRST NAME-->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>First Name</label>
-                                    {{ form.first_name }}
-                                </div>
-                            </div>
-                            <!--LAST NAME-->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Last Name</label>
-                                    {{ form.last_name }}
-                                </div>
-                            </div>
-                            <!--COUNTRY-->
                             <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Select Country</label>
-                                    <div class="form-field">
-                                        {{ form.country }}
+                                <div class="cart-detail">
+                                    <h2>Cart Total</h2>
+                                    <ul>
+                                        <li><span>Subtotal:</span><span>${{ cart.get_total_all_products_price }}</span>
+                                        </li>
+                                        <li><span>Delivery:</span><span>${{ cart.get_delivery_price }}</span></li>
+                                        <li><span>Total:</span><span>${{ cart.get_final_order_price }}</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="w-100"></div>
+                            <div class="col-md-12">
+                                <div class="cart-detail">
+                                    <h2>Payment Method</h2>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div class="radio">
+                                                <!--<label><input type="radio" name="payment_method" value="stripe">-->
+                                                <label> {{ form.payment_method }} Stripe </label>
+
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <!--CITY-->
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Town / City</label>
-                                    {{ form.city }}
-                                </div>
-                            </div>
-                            <!--ADRESS-->
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Address</label>
-                                    {{ form.address }}
-                                </div>
-                            </div>
-                            <!--REGION-->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Region</label>
-                                    {{ form.state }}
-                                </div>
-                            </div>
-                            <!--ZIP-->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Zip / Postal Code</label>
-                                    {{ form.zip }}
-                                </div>
-                            </div>
-                            <!--EMAIL-->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Email Address</label>
-                                    {{ form.email }}
-                                </div>
-                            </div>
-                            <!--PHONE-->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Phone Number</label>
-                                    {{ form.phone }}
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <div class="radio">
-                                        <label><input type="radio" name="optradio"> Create an Account? </label>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <div class="checkbox">
+                                                <!--                                            <label><input type="checkbox" value="accept">-->
+                                                <!--                                                I have read and accept the terms and conditions-->
+                                                <!--                                            </label>-->
+
+                                                <label> {{ form.accept_terms }}
+                                                    I have read and accept the terms and conditions
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="cart-detail">
-                                <h2>Cart Total</h2>
-                                <ul>
-                                    <li><span>Subtotal:</span> <span>${{ cart.get_total_all_products_price }}</span></li>
-                                    <li><span>Delivery:</span> <span>${{ cart.get_delivery_price }}</span></li>
-                                    <li><span>Total:</span> <span>${{ cart.get_final_order_price }}</span></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="w-100"></div>
-
-                        <div class="col-md-12">
-                            <div class="cart-detail">
-                                <h2>Payment Method</h2>
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <div class="radio">
-                                            <label><input type="radio" name="optradio"> Stripe</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <div class="radio">
-                                            <label><input type="radio" name="optradio"> Paypal</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <div class="checkbox">
-                                            <label><input type="checkbox" value=""> I have read and accept the terms and
-                                                conditions</label>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <button type="submit" class="btn btn-primary col-md-12" id="checkout-button">
+                                    Place an order
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-<!--                        <div class="col-md-12 text-center">-->
-<!--                            <p><a href="{% url 'orders:create-checkout-session' %}" class="btn btn-primary">Place an order</a></p>-->
-<!--                        </div>-->
-                        <form action="{% url 'orders:create-checkout-session' %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" id="checkout-button">Place an order</button>
-                        </form>
-                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
     {% include 'include/footer.html' %}

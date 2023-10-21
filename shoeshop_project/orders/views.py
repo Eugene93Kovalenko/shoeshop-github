@@ -24,6 +24,11 @@ class CartView(generic.ListView):
     def get_queryset(self):
         return Cart(self.request)
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
+
 
 @require_POST
 def add_to_cart(request, slug):
@@ -50,24 +55,9 @@ def remove_from_cart(request, slug):
         return redirect("orders:cart")
 
 
-def checkout(request):
-    if request.method == 'POST':
-        print('-------------')
-        form = CheckoutForm(request.POST)
-        if form.is_valid():
-            print(form.cleaned_data['phone'])
-            print(form.cleaned_data['accept_terms'])
-            return reverse("orders:create-checkout-session")
-    else:
-        form = CheckoutForm()
-
-    return render(request, 'orders/checkout.html', {'form': form})
-
-
 class CheckoutFormView(generic.FormView):
     template_name = "orders/checkout.html"
     form_class = CheckoutForm
-    # success_url = '/create-checkout-session/'
 
     def get_success_url(self):
         return reverse('orders:create-checkout-session')
@@ -116,6 +106,7 @@ class CreateStripeCheckoutSessionView(generic.View):
 
     def get(self, request):
         checkout_session = stripe.checkout.Session.create(
+            client_reference_id=request.user.id,
             payment_method_types=['card'],
             line_items=self.get_line_items_list(),
             mode='payment',
@@ -128,7 +119,7 @@ class CreateStripeCheckoutSessionView(generic.View):
 
     def get_metadata(self):
         cart = Cart(self.request)
-        metadata = {'user': self.request.user}
+        metadata = {}
         for item in cart:
             metadata[item['product_variation'].id] = item['quantity']
         return metadata
@@ -152,8 +143,8 @@ class CreateStripeCheckoutSessionView(generic.View):
         return line_items_list
 
     def get_user_email(self):
-        if self.request.user.is_authenticated:
-            return self.request.user.email
+        # if self.request.user.is_authenticated:
+        return self.request.user.email
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -183,47 +174,28 @@ class StripeWebhookView(generic.View):
 
 
 def _handle_successful_payment(session):
-    customer_email = session['metadata']['user']
-    _ = session['metadata'].pop('user')
+    user_id = session['client_reference_id']
+    user = CustomUser.objects.get(id=user_id)
     amount = session['amount_total']
     ordered_date = timezone.now()
-    user = CustomUser.objects.filter(email=customer_email)
-    if user:
-        user = user[0]
-        order = Order.objects.create(
+    order = Order.objects.create(
+        user=user,
+        ordered_date=ordered_date,
+        ordered=True)
+    for key, value in session['metadata'].items():
+        order_item = OrderItem.objects.create(
             user=user,
-            ordered_date=ordered_date,
-            ordered=True)
-        for key, value in session['metadata'].items():
-            order_item = OrderItem.objects.create(
-                user=user,
-                product_variation=ProductVariation.objects.get(id=key),
-                quantity=value,
-                ordered=True
-            )
-            order.products.add(order_item)
-        Payment.objects.create(
-            stripe_charge_id=session['id'],
-            user=user,
-            order=order,
-            amount=amount / 100,
+            product_variation=ProductVariation.objects.get(id=key),
+            quantity=value,
+            ordered=True
         )
-    else:
-        order = Order.objects.create(
-            ordered_date=ordered_date,
-            ordered=True)
-        for key, value in session['metadata'].items():
-            order_item = OrderItem.objects.create(
-                product_variation=ProductVariation.objects.get(id=key),
-                quantity=value,
-                ordered=True
-            )
-            order.products.add(order_item)
-        Payment.objects.create(
-            stripe_charge_id=session['id'],
-            order=order,
-            amount=amount / 100,
-        )
+        order.products.add(order_item)
+    Payment.objects.create(
+        stripe_charge_id=session['id'],
+        user=user,
+        order=order,
+        amount=amount / 100,
+    )
 
 
 class OrderCompleteView(generic.TemplateView):

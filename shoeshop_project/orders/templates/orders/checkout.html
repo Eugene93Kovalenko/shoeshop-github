@@ -9,7 +9,6 @@
     <div class="colorlib-product">
         <div class="container">
             {% include 'include/order_breadcrumbs.html' %}
-<!--            <form method="POST" action="{% url 'orders:create-checkout-session' %}">-->
             <form method="POST">
                 {% csrf_token %}
                 <div class="row">
@@ -80,15 +79,6 @@
                                     <div class="form-group">
                                         <label>Phone Number</label>
                                         {{ form.phone }}
-                                    </div>
-                                </div>
-                                <!--CREATE_ACCOUNT-->
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <div class="radio">
-                                            {{ form.create_account }}
-                                            <label> Create an Account? </label>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

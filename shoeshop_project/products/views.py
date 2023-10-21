@@ -1,13 +1,12 @@
 from time import timezone
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
+from django.core.mail import send_mail
 
-from orders.cart import Cart
-from orders.models import OrderItem, Order
-from .filters import ProductFilter
+from .forms import ContactForm
 from .models import *
 
 
@@ -98,12 +97,50 @@ class ProductDetailView(generic.DetailView):
         context["product_images"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
         context['sizes_per_product_list'] = [product.size for product in ProductVariation.objects.filter(
             product__slug=self.kwargs["product_slug"])]
+        context['product_reviews'] = Review.objects.filter(product__slug=self.kwargs["product_slug"])
+        context['reviews_quantity'] = Review.objects.filter(product__slug=self.kwargs["product_slug"]).count()
+        context['average_product_rating'] = Review.objects.filter(product__slug=self.kwargs[
+            "product_slug"]).aggregate(average=Avg('rate', default=0))
+        if context['average_product_rating'] is not None:
+            context['average_rating'] = float(context['average_product_rating']['average'])
+        print(context['average_rating'])
         return context
+
+
+class ContactView(generic.FormView):
+    template_name = "products/contact.html"
+    form_class = ContactForm
+
+    def get_success_url(self):
+        return reverse('products:home')
+
+    def form_valid(self, form):
+        sender = form.cleaned_data['email']
+        subject = form.cleaned_data['subject']
+        message = form.cleaned_data['message']
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=sender,
+            recipient_list=['udjin93@yandex.ru'],
+        )
+        return super(ContactView, self).form_valid(form)
 
 
 class AboutView(generic.TemplateView):
     template_name = "products/about.html"
 
 
-class ContactView(generic.TemplateView):
-    template_name = "products/contact.html"
+class ProductReview(generic.ListView):
+    model = Product
+    template_name = "products/product-detail.html"
+    context_object_name = "reviews"
+
+    def get_queryset(self):
+        print(Review.objects.filter(product__slug='women_boots'))
+        return Review.objects.filter(product__slug='women_boots')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reviews_quantity'] = Review.objects.filter(product__slug='women_boots').count()
+        return context

@@ -10,6 +10,7 @@ admin.site.register(Size)
 admin.site.register(Material)
 admin.site.register(Brand)
 admin.site.register(Gender)
+admin.site.register(Review)
 
 
 # admin.site.register(ProductOption)

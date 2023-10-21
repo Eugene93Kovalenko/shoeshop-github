@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.urls import reverse
+from config import settings
 
 
 class Category(models.Model):
@@ -149,3 +151,22 @@ class ProductImage(models.Model):
 
     def get_absolute_url(self):
         return self.image.url
+
+
+class Review(models.Model):
+    RATING_CHOICES = (
+        (1, '1'),
+        (2, '2'),
+        (3, '3'),
+        (4, '4'),
+        (5, '5'),
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    text = models.TextField(max_length=3000, blank=True)
+    rate = models.PositiveIntegerField(choices=RATING_CHOICES,
+                                       validators=[MinValueValidator(1), MaxValueValidator(5)])
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{str(self.user)} | {self.product}'

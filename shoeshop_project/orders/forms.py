@@ -23,6 +23,5 @@ class CheckoutForm(forms.Form):
                                                             'placeholder': 'Enter your email'}))
     phone = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control',
                                                           'placeholder': 'Enter your phone number'}))
-    create_account = forms.BooleanField(label='CREATE AN ACCOUNT?', widget=forms.CheckboxInput, required=False)
     payment_method = forms.BooleanField(widget=forms.CheckboxInput)
     accept_terms = forms.BooleanField(widget=forms.CheckboxInput)

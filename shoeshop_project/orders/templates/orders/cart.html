@@ -62,15 +62,15 @@
                         <div class="one-eight text-center">
 
                             <div class="display-tc">
-<!--                                <button class="btn btn-sm btn-primary btn-plus" data-type="plus" data-field="">-->
-<!--                                <i class="icon-minus2"></i>-->
-<!--                                </button>-->
+                                <!--                                <button class="btn btn-sm btn-primary btn-plus" data-type="plus" data-field="">-->
+                                <!--                                <i class="icon-minus2"></i>-->
+                                <!--                                </button>-->
                                 <input type="text" id="quantity" name="quantity"
                                        class="form-control input-number text-center"
                                        value="{{ item.quantity }}" min="1" max="100">
-<!--                                <button class="btn btn-sm btn-primary btn-minus" data-type="minus" data-field="">-->
-<!--                                <i class="fas fa-caret-up"></i>-->
-<!--                                </button>-->
+                                <!--                                <button class="btn btn-sm btn-primary btn-minus" data-type="minus" data-field="">-->
+                                <!--                                <i class="fas fa-caret-up"></i>-->
+                                <!--                                </button>-->
                             </div>
                         </div>
                         <div class="one-eight text-center">
@@ -97,6 +97,7 @@
                     <div class="total-wrap">
                         <div class="row">
                             <div class="col-sm-8">
+                                <!--COUPON-->
                                 <form action="#">
                                     <div class="row form-group">
                                         <div class="col-sm-9">
@@ -115,17 +116,23 @@
                                         <p><span>Subtotal:</span>
                                             <span>${{ cart.get_total_all_products_price }}</span></p>
                                         <p><span>Delivery:</span> <span>${{ cart.get_delivery_price }}</span></p>
-<!--                                        <p><span>Discount:</span> <span>${{ get_total_discount }}</span></p>-->
                                     </div>
                                     <div class="grand-total">
-                                        <p><span><strong>Total:</strong></span> <span>${{ cart.get_final_order_price }}</span>
+                                        <p>
+                                            <span><strong>Total:</strong></span>
+                                            <span>${{ cart.get_final_order_price }}</span>
                                         </p>
                                     </div>
                                 </div>
                                 <p></p>
                                 <div class="col-sm-12 button-container">
-                                    <a href="{% url 'orders:checkout' %}" class="block-26 mb-2 side border mb-1">Proceed
-                                        to checkout</a>
+                                    {% if user.is_authenticated %}
+                                    <a href="{% url 'orders:checkout' %}" class="block-26 mb-2 side border mb-1">
+                                        Proceed to checkout</a>
+                                    {% else %}
+                                    <a href="{% url 'accounts:login' %}" class="block-26 mb-2 side border mb-1">
+                                        Proceed to checkout</a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

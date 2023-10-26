@@ -13,3 +13,11 @@ class ContactForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control',
                                                            'placeholder': 'Say something about us'}))
 
+
+class ReviewForm(forms.Form):
+    RATING_CHOICES = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5))
+
+    rate = forms.CharField(widget=forms.RadioSelect(choices=RATING_CHOICES))
+    text = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
+    # username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    # email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))

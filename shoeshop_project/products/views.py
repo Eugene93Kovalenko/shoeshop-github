@@ -1,12 +1,14 @@
 from time import timezone
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Avg
 from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
 from django.core.mail import send_mail
+from django.views.generic.edit import FormMixin
 
-from .forms import ContactForm
+from .forms import ContactForm, ReviewForm
 from .models import *
 
 
@@ -86,11 +88,39 @@ class ShopView(generic.ListView):
         return context
 
 
-class ProductDetailView(generic.DetailView):
+class ProductDetailView(FormMixin, generic.DetailView):
     model = Product
     template_name = "products/product-detail.html"
     context_object_name = "product"
     slug_url_kwarg = "product_slug"
+    form_class = ReviewForm
+
+    # def get_initial(self):
+    #     return self.get_object()
+
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        if user.is_anonymous:
+            return redirect('accounts:login')
+        print('------------')
+        # self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        product = Product.objects.get(slug=self.kwargs["product_slug"])
+        rate = form.cleaned_data['rate']
+        text = form.cleaned_data['text']
+        user = self.request.user
+        review = Review.objects.create(product=product, rate=rate, text=text, user=user)
+        review.save()
+        return super(ProductDetailView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('products:home')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,11 +129,17 @@ class ProductDetailView(generic.DetailView):
             product__slug=self.kwargs["product_slug"])]
         context['product_reviews'] = Review.objects.filter(product__slug=self.kwargs["product_slug"])
         context['reviews_quantity'] = Review.objects.filter(product__slug=self.kwargs["product_slug"]).count()
-        context['average_product_rating'] = Review.objects.filter(product__slug=self.kwargs[
+        context['average_rating'] = self.get_average_rating()
+        return context
+
+    def _round_custom(self, num, step):
+        return round(num / step) * step
+
+    def get_average_rating(self):
+        average_product_rating = Review.objects.filter(product__slug=self.kwargs[
             "product_slug"]).aggregate(average=Avg('rate', default=0))
-        if context['average_product_rating'] is not None:
-            context['average_rating'] = float(context['average_product_rating']['average'])
-        print(context['average_rating'])
+        if average_product_rating is not None:
+            context = self._round_custom(float(average_product_rating['average']), 0.5)
         return context
 
 

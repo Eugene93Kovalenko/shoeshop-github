@@ -1,4 +1,6 @@
-from time import timezone
+# from datetime import datetime
+# from time import timezone
+from django.utils import timezone
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -98,11 +100,24 @@ class ProductDetailView(FormMixin, generic.DetailView):
     # def get_initial(self):
     #     return self.get_object()
 
+    def get(self, request, *args, **kwargs):
+        if 'recently_viewed' not in request.session:
+            request.session['recently_viewed'] = [self.kwargs['product_slug']]
+        else:
+            if self.kwargs['product_slug'] in request.session['recently_viewed']:
+                request.session['recently_viewed'].remove(self.kwargs['product_slug'])
+            request.session['recently_viewed'].insert(0, self.kwargs['product_slug'])
+
+        request.session.modified = True
+        current_product = Product.objects.get(slug=self.kwargs["product_slug"])
+        current_product.last_visit = timezone.now()
+        current_product.save()
+        return super().get(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         user = self.request.user
         if user.is_anonymous:
             return redirect('accounts:login')
-        print('------------')
         # self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
@@ -112,10 +127,14 @@ class ProductDetailView(FormMixin, generic.DetailView):
 
     def form_valid(self, form):
         product = Product.objects.get(slug=self.kwargs["product_slug"])
-        rate = form.cleaned_data['rate']
-        text = form.cleaned_data['text']
         user = self.request.user
-        review = Review.objects.create(product=product, rate=rate, text=text, user=user)
+        form_data = form.cleaned_data
+        review = Review.objects.create(product=product,
+                                       rate=form_data['rate'],
+                                       text=form_data['text'],
+                                       user=user,
+                                       first_name=form_data['first_name'],
+                                       last_name=form_data['last_name'])
         review.save()
         return super(ProductDetailView, self).form_valid(form)
 

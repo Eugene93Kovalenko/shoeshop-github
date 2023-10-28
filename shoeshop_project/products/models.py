@@ -96,6 +96,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     num_visits = models.IntegerField(default=0)
+    last_visit = models.DateTimeField(blank=True, null=True)
     category = models.ManyToManyField(Category, related_name="products", blank=True)
 
     def __str__(self):
@@ -166,7 +167,13 @@ class Review(models.Model):
                                        validators=[MinValueValidator(1), MaxValueValidator(5)])
     text = models.TextField(max_length=3000, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     created_at = models.DateField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
     def __str__(self):
-        return f'{str(self.user)} | {self.product}'
+        return f'{str(self.user)} | {self.product} | {self.rate}'

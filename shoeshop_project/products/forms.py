@@ -15,9 +15,15 @@ class ContactForm(forms.Form):
 
 
 class ReviewForm(forms.Form):
-    RATING_CHOICES = ((1, 1), (2, 2), (3, 3), (4, 4), (5, 5))
+    RATING_CHOICES = [
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5)
+    ]
 
     rate = forms.CharField(widget=forms.RadioSelect(choices=RATING_CHOICES))
-    text = forms.CharField(required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
-    # username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
-    # email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    text = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'class': 'form-control'}))

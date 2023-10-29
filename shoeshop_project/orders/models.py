@@ -23,10 +23,10 @@ class OrderItem(models.Model):
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
 
-    def get_total_product_price(self):
-        if self.product_variation.product.discount_price:
-            return self.quantity * self.product_variation.product.discount_price
-        return self.quantity * self.product_variation.product.price
+    # def get_total_product_price(self):
+    #     if self.product_variation.product.discount_price:
+    #         return self.quantity * self.product_variation.product.discount_price
+    #     return self.quantity * self.product_variation.product.price
 
     def get_remove_from_cart_url(self):
         return reverse("orders:remove-from-cart", kwargs={"slug": self.product_variation.product.slug})
@@ -44,9 +44,8 @@ class Order(models.Model):
     ordered = models.BooleanField(default=False)
     shipping_address = models.ForeignKey(
         'ShippingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
-
-    # coupon = models.ForeignKey(
-    #     'Coupon', on_delete=models.SET_NULL, blank=True, null=True)
+    coupon = models.ForeignKey(
+        'Coupon', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return f"{self.user} | Ordered: {self.ordered}"
@@ -94,5 +93,15 @@ class Payment(models.Model):
         verbose_name = 'Оплата'
         verbose_name_plural = 'Оплаты'
 
-    # def __str__(self):
-    #     return self.user
+
+class Coupon(models.Model):
+    code = models.CharField(max_length=15)
+    amount = models.FloatField()
+    one_timer = models.BooleanField()
+
+    class Meta:
+        verbose_name = 'Купон'
+        verbose_name_plural = 'Купоны'
+
+    def __str__(self):
+        return self.code

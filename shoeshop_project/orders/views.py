@@ -2,6 +2,7 @@ from decimal import Decimal
 
 import stripe
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -10,25 +11,48 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.views.generic.edit import FormMixin
 
 from accounts.models import CustomUser
 from orders.cart import Cart
 from orders.forms import CheckoutForm
 from orders.models import *
+from products.forms import CouponForm
 
 
-class CartView(generic.ListView):
+class CartView(FormMixin, generic.ListView):
     template_name = "orders/cart.html"
     context_object_name = 'cart_items'
+    form_class = CouponForm
 
     def get_queryset(self):
         return Cart(self.request)
 
+    def post(self, *args, **kwargs):
+        # form = CouponForm(self.request.POST or None)
+        form = self.get_form()
+        if form.is_valid():
+            print('valid')
+            if form.is_valid():
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+
+    def form_valid(self, form):
+        for item in Cart(self.request):
+            item['price'] = int(item['price']) * 0.9
+        print(list(Cart(self.request)))
+        return super(CartView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('orders:cart')
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
-        context['recently_viewed'] = Product.objects.filter(slug__in=self.request.session[
-            'recently_viewed']).order_by('-last_visit')[:4]
+        if self.request.session['recently_viewed']:
+            context['recently_viewed'] = Product.objects.filter(slug__in=self.request.session[
+                'recently_viewed']).order_by('-last_visit')[:4]
         return context
 
 
@@ -93,6 +117,32 @@ class CheckoutFormView(generic.FormView):
         return super(CheckoutFormView, self).form_valid(form)
 
 
+# def get_coupon(request, code):
+#     try:
+#         coupon = Coupon.objects.get(code=code)
+#         return coupon
+#     except ObjectDoesNotExist:
+#         messages.info(request, "This coupon does not exist")
+#         return redirect("orders:cart")
+#
+#
+# class AddCouponView(generic.View):
+#     def post(self, *args, **kwargs):
+#         form = CouponForm(self.request.POST or None)
+#         if form.is_valid():
+#             try:
+#                 code = form.cleaned_data.get('code')
+#                 order = Order.objects.get(
+#                     user=self.request.user, ordered=False)
+#                 order.coupon = get_coupon(self.request, code)
+#                 order.save()
+#                 # messages.success(self.request, "Successfully added coupon")
+#                 return redirect("orders:cart")
+#             except ObjectDoesNotExist:
+#                 # messages.info(self.request, "You do not have an active order")
+#                 return redirect("orders:cart")
+
+
 class CreateStripeCheckoutSessionView(generic.View):
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -132,10 +182,21 @@ class CreateStripeCheckoutSessionView(generic.View):
                     'quantity': item['quantity']
                 }
             )
+        line_items_list.append(
+            {
+                'price_data': {
+                    'currency': 'usd',
+                    'unit_amount': int(cart.get_delivery_price()) * 100,
+                    'product_data': {
+                        'name': 'DELIVERY',
+                    },
+                },
+                'quantity': '1'
+            }
+        )
         return line_items_list
 
     def get_user_email(self):
-        # if self.request.user.is_authenticated:
         return self.request.user.email
 
 

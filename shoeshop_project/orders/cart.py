@@ -55,14 +55,15 @@ class Cart:
         self.save()
 
     def save(self):
-        # self.session[settings.CART_SESSION_ID] = self.cart
         self.session.modified = True
 
     def get_total_all_products_price(self):
         return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
 
     def get_delivery_price(self):
-        return Decimal(50.00)
+        if self.get_total_all_products_price():
+            return Decimal('50.00')
+        return 0
 
     def get_final_order_price(self):
         return self.get_total_all_products_price() + self.get_delivery_price()

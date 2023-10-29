@@ -97,9 +97,6 @@ class ProductDetailView(FormMixin, generic.DetailView):
     slug_url_kwarg = "product_slug"
     form_class = ReviewForm
 
-    # def get_initial(self):
-    #     return self.get_object()
-
     def get(self, request, *args, **kwargs):
         if 'recently_viewed' not in request.session:
             request.session['recently_viewed'] = [self.kwargs['product_slug']]
@@ -107,7 +104,8 @@ class ProductDetailView(FormMixin, generic.DetailView):
             if self.kwargs['product_slug'] in request.session['recently_viewed']:
                 request.session['recently_viewed'].remove(self.kwargs['product_slug'])
             request.session['recently_viewed'].insert(0, self.kwargs['product_slug'])
-
+            if len(request.session['recently_viewed']) > 4:
+                request.session['recently_viewed'].pop()
         request.session.modified = True
         current_product = Product.objects.get(slug=self.kwargs["product_slug"])
         current_product.last_visit = timezone.now()

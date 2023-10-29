@@ -8,6 +8,7 @@ urlpatterns = [
     path('cart/', CartView.as_view(), name='cart'),
     path('add_to_cart/<slug:slug>', add_to_cart, name='add-to-cart'),
     path('remove_from_cart/<slug:slug>', remove_from_cart, name='remove-from-cart'),
+    # path('add-coupon/', AddCouponView.as_view(), name='add-coupon'),
     path('cart/checkout/', CheckoutFormView.as_view(), name='checkout'),
     path("create-checkout-session/", CreateStripeCheckoutSessionView.as_view(), name="create-checkout-session"),
     path('success/', OrderCompleteView.as_view(), name='success'),

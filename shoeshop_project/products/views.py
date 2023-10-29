@@ -8,6 +8,7 @@ from django.db.models import Q, Avg
 from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
 from django.core.mail import send_mail
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormMixin
 
 from .forms import ContactForm, ReviewForm
@@ -90,12 +91,11 @@ class ShopView(generic.ListView):
         return context
 
 
-class ProductDetailView(FormMixin, generic.DetailView):
+class ProductDetailView(generic.DetailView):
     model = Product
     template_name = "products/product-detail.html"
     context_object_name = "product"
     slug_url_kwarg = "product_slug"
-    form_class = ReviewForm
 
     def get(self, request, *args, **kwargs):
         if 'recently_viewed' not in request.session:
@@ -111,6 +111,33 @@ class ProductDetailView(FormMixin, generic.DetailView):
         current_product.last_visit = timezone.now()
         current_product.save()
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = ReviewForm()
+        context["product_images"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
+        context['sizes_per_product_list'] = [product.size for product in ProductVariation.objects.filter(
+            product__slug=self.kwargs["product_slug"])]
+        context['product_reviews'] = Review.objects.filter(product__slug=self.kwargs["product_slug"])
+        context['reviews_quantity'] = Review.objects.filter(product__slug=self.kwargs["product_slug"]).count()
+        context['average_rating'] = self.get_average_rating()
+        return context
+
+    def _round_custom(self, num, step):
+        return round(num / step) * step
+
+    def get_average_rating(self):
+        average_product_rating = Review.objects.filter(product__slug=self.kwargs[
+            "product_slug"]).aggregate(average=Avg('rate', default=0))
+        if average_product_rating is not None:
+            context = self._round_custom(float(average_product_rating['average']), 0.5)
+        return context
+
+
+class ProductFormView(SingleObjectMixin, generic.FormView):
+    model = Product
+    template_name = "products/product-detail.html"
+    form_class = ReviewForm
 
     def post(self, request, *args, **kwargs):
         user = self.request.user
@@ -134,30 +161,20 @@ class ProductDetailView(FormMixin, generic.DetailView):
                                        first_name=form_data['first_name'],
                                        last_name=form_data['last_name'])
         review.save()
-        return super(ProductDetailView, self).form_valid(form)
+        return super(ProductFormView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('products:home')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["product_images"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
-        context['sizes_per_product_list'] = [product.size for product in ProductVariation.objects.filter(
-            product__slug=self.kwargs["product_slug"])]
-        context['product_reviews'] = Review.objects.filter(product__slug=self.kwargs["product_slug"])
-        context['reviews_quantity'] = Review.objects.filter(product__slug=self.kwargs["product_slug"]).count()
-        context['average_rating'] = self.get_average_rating()
-        return context
 
-    def _round_custom(self, num, step):
-        return round(num / step) * step
+class ProductView(generic.View):
+    def get(self, request, *args, **kwargs):
+        view = ProductDetailView.as_view()
+        return view(request, *args, **kwargs)
 
-    def get_average_rating(self):
-        average_product_rating = Review.objects.filter(product__slug=self.kwargs[
-            "product_slug"]).aggregate(average=Avg('rate', default=0))
-        if average_product_rating is not None:
-            context = self._round_custom(float(average_product_rating['average']), 0.5)
-        return context
+    def post(self, request, *args, **kwargs):
+        view = ProductFormView.as_view()
+        return view(request, *args, **kwargs)
 
 
 class ContactView(generic.FormView):

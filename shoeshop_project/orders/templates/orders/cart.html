@@ -119,15 +119,24 @@
                                     </div>
                                 </div>
                                 <p></p>
+                                <p>
+                                {% for message in messages%}
+                                {{ message }}
+                                {% endfor %}
+                                </p>
+<!--                                <form method="post" action="">-->
+<!--                                    {% csrf_token %}-->
                                 <div class="col-sm-12 button-container">
                                     {% if user.is_authenticated %}
                                     <a href="{% url 'orders:checkout' %}" class="block-26 mb-2 side border mb-1">
+<!--                                    <button type="submit" class="block-26 mb-2 side border mb-1">-->
                                         Proceed to checkout</a>
                                     {% else %}
                                     <a href="{% url 'accounts:login' %}" class="block-26 mb-2 side border mb-1">
                                         Proceed to checkout</a>
                                     {% endif %}
                                 </div>
+<!--                                </form>-->
                             </div>
                         </div>
                     </div>

@@ -28,20 +28,24 @@ class CartView(FormMixin, generic.ListView):
     def get_queryset(self):
         return Cart(self.request)
 
+    # def get(self, request, *args, **kwargs):
+    #     cart = Cart(self.request)
+    #     if not cart.get_final_order_price():
+    #         messages.warning(self.request, "Вы не добавили ни одного товара в корзину")
+    #         return super().get(request, *args, **kwargs)
+
     def post(self, *args, **kwargs):
-        # form = CouponForm(self.request.POST or None)
         form = self.get_form()
         if form.is_valid():
-            print('valid')
-            if form.is_valid():
-                return self.form_valid(form)
-            else:
-                return self.form_invalid(form)
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     def form_valid(self, form):
-        for item in Cart(self.request):
-            item['price'] = int(item['price']) * 0.9
-        print(list(Cart(self.request)))
+        cart = Cart(self.request)
+        # for item in cart:
+        #     item['price'] = int(item['price']) * 0.9
+        print('+++++++++++')
         return super(CartView, self).form_valid(form)
 
     def get_success_url(self):
@@ -50,6 +54,7 @@ class CartView(FormMixin, generic.ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
+        context['form'] = CouponForm()
         if self.request.session['recently_viewed']:
             context['recently_viewed'] = Product.objects.filter(slug__in=self.request.session[
                 'recently_viewed']).order_by('-last_visit')[:4]
@@ -117,30 +122,30 @@ class CheckoutFormView(generic.FormView):
         return super(CheckoutFormView, self).form_valid(form)
 
 
-# def get_coupon(request, code):
-#     try:
-#         coupon = Coupon.objects.get(code=code)
-#         return coupon
-#     except ObjectDoesNotExist:
-#         messages.info(request, "This coupon does not exist")
-#         return redirect("orders:cart")
-#
-#
-# class AddCouponView(generic.View):
-#     def post(self, *args, **kwargs):
-#         form = CouponForm(self.request.POST or None)
-#         if form.is_valid():
-#             try:
-#                 code = form.cleaned_data.get('code')
-#                 order = Order.objects.get(
-#                     user=self.request.user, ordered=False)
-#                 order.coupon = get_coupon(self.request, code)
-#                 order.save()
-#                 # messages.success(self.request, "Successfully added coupon")
-#                 return redirect("orders:cart")
-#             except ObjectDoesNotExist:
-#                 # messages.info(self.request, "You do not have an active order")
-#                 return redirect("orders:cart")
+def get_coupon(request, code):
+    try:
+        coupon = Coupon.objects.get(code=code)
+        return coupon
+    except ObjectDoesNotExist:
+        messages.info(request, "This coupon does not exist")
+        return redirect("orders:cart")
+
+
+class AddCouponView(generic.View):
+    def post(self, *args, **kwargs):
+        form = CouponForm(self.request.POST or None)
+        if form.is_valid():
+            try:
+                code = form.cleaned_data.get('code')
+                order = Order.objects.get(
+                    user=self.request.user, ordered=False)
+                order.coupon = get_coupon(self.request, code)
+                order.save()
+                # messages.success(self.request, "Successfully added coupon")
+                return redirect("orders:cart")
+            except ObjectDoesNotExist:
+                # messages.info(self.request, "You do not have an active order")
+                return redirect("orders:cart")
 
 
 class CreateStripeCheckoutSessionView(generic.View):

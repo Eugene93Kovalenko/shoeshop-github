@@ -23,11 +23,6 @@ class OrderItem(models.Model):
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"
 
-    # def get_total_product_price(self):
-    #     if self.product_variation.product.discount_price:
-    #         return self.quantity * self.product_variation.product.discount_price
-    #     return self.quantity * self.product_variation.product.price
-
     def get_remove_from_cart_url(self):
         return reverse("orders:remove-from-cart", kwargs={"slug": self.product_variation.product.slug})
 

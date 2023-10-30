@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormMixin
 
 from accounts.models import CustomUser
@@ -20,13 +21,26 @@ from orders.models import *
 from products.forms import CouponForm
 
 
-class CartView(FormMixin, generic.ListView):
+class CartListView(generic.ListView):
     template_name = "orders/cart.html"
     context_object_name = 'cart_items'
-    form_class = CouponForm
 
     def get_queryset(self):
         return Cart(self.request)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        context['form'] = CouponForm()
+        if self.request.session['recently_viewed']:
+            context['recently_viewed'] = Product.objects.filter(slug__in=self.request.session[
+                'recently_viewed']).order_by('-last_visit')[:4]
+        return context
+
+
+class CartCouponFormView(SingleObjectMixin, generic.FormView):
+    template_name = "orders/cart.html"
+    form_class = CouponForm
 
     # def get(self, request, *args, **kwargs):
     #     cart = Cart(self.request)
@@ -43,22 +57,24 @@ class CartView(FormMixin, generic.ListView):
 
     def form_valid(self, form):
         cart = Cart(self.request)
-        # for item in cart:
-        #     item['price'] = int(item['price']) * 0.9
+        for item in cart:
+            item['price'] = int(item['price']) * 0.9
+        print(list(cart))
         print('+++++++++++')
-        return super(CartView, self).form_valid(form)
+        return super(CartCouponFormView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse('orders:cart')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user'] = self.request.user
-        context['form'] = CouponForm()
-        if self.request.session['recently_viewed']:
-            context['recently_viewed'] = Product.objects.filter(slug__in=self.request.session[
-                'recently_viewed']).order_by('-last_visit')[:4]
-        return context
+
+class CartView(generic.View):
+    def get(self, request, *args, **kwargs):
+        view = CartListView.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        view = CartCouponFormView.as_view()
+        return view(request, *args, **kwargs)
 
 
 @require_POST
@@ -95,57 +111,71 @@ class CheckoutFormView(generic.FormView):
 
     def form_valid(self, form):
         user = self.request.user
+        cart = Cart(self.request)
+        ordered_date = timezone.now()
+        old_order = Order.objects.filter(user=user, ordered=False)
+        if old_order:
+            Order.objects.get(user=user, ordered=False).delete()
+
+            old_order_items = OrderItem.objects.filter(user=user, ordered=False)
+            for item in old_order_items:
+                item.delete()
+
+        order = Order.objects.create(
+            user=user,
+            ordered_date=ordered_date,
+            ordered=False)
+        for item in cart:
+            order_item = OrderItem.objects.create(
+                user=user,
+                product_variation=item['product_variation'],
+                quantity=item['quantity']
+            )
+            order.products.add(order_item)
+        old_shipping_address = ShippingAddress.objects.filter(user=user)
+        if old_shipping_address:
+            ShippingAddress.objects.get(user=user).delete()
+        shipping_address = ShippingAddress.objects.create(
+            user=user,
+            country=form.cleaned_data['country'],
+            region=form.cleaned_data['region'],
+            city=form.cleaned_data['city'],
+            zip=form.cleaned_data['zip'],
+            address=form.cleaned_data['address'],
+            default=True
+        )
+        order.shipping_address = shipping_address
+        order.save()
+
         user.first_name = form.cleaned_data['first_name']
         user.last_name = form.cleaned_data['last_name']
         user.phone = form.cleaned_data['phone']
         user.save()
-        if ShippingAddress.objects.get(user=user):
-            ShippingAddress.objects.update(
-                user=user,
-                country=form.cleaned_data['country'],
-                region=form.cleaned_data['region'],
-                city=form.cleaned_data['city'],
-                zip=form.cleaned_data['zip'],
-                address=form.cleaned_data['address'],
-                default=True
-            )
-        else:
-            ShippingAddress.objects.create(
-                user=user,
-                country=form.cleaned_data['country'],
-                region=form.cleaned_data['region'],
-                city=form.cleaned_data['city'],
-                zip=form.cleaned_data['zip'],
-                address=form.cleaned_data['address'],
-                default=True
-            )
         return super(CheckoutFormView, self).form_valid(form)
 
 
-def get_coupon(request, code):
-    try:
-        coupon = Coupon.objects.get(code=code)
-        return coupon
-    except ObjectDoesNotExist:
-        messages.info(request, "This coupon does not exist")
-        return redirect("orders:cart")
+# def get_coupon(request, code):
+#     try:
+#         coupon = Coupon.objects.get(code=code)
+#         return coupon
+#     except ObjectDoesNotExist:
+#         messages.info(request, "This coupon does not exist")
+#         return redirect("orders:cart")
 
 
-class AddCouponView(generic.View):
-    def post(self, *args, **kwargs):
-        form = CouponForm(self.request.POST or None)
-        if form.is_valid():
-            try:
-                code = form.cleaned_data.get('code')
-                order = Order.objects.get(
-                    user=self.request.user, ordered=False)
-                order.coupon = get_coupon(self.request, code)
-                order.save()
-                # messages.success(self.request, "Successfully added coupon")
-                return redirect("orders:cart")
-            except ObjectDoesNotExist:
-                # messages.info(self.request, "You do not have an active order")
-                return redirect("orders:cart")
+# class AddCouponView(generic.View):
+#     def post(self, *args, **kwargs):
+#         form = CouponForm(self.request.POST or None)
+#         if form.is_valid():
+#             try:
+#                 code = form.cleaned_data.get('code')
+#                 order = Order.objects.get(
+#                     user=self.request.user, ordered=False)
+#                 order.coupon = get_coupon(self.request, code)
+#                 order.save()
+#                 return redirect("orders:cart")
+#             except ObjectDoesNotExist:
+#                 return redirect("orders:cart")
 
 
 class CreateStripeCheckoutSessionView(generic.View):
@@ -236,24 +266,22 @@ def _handle_successful_payment(session):
     user = CustomUser.objects.get(id=user_id)
     amount = session['amount_total']
     ordered_date = timezone.now()
-    order = Order.objects.create(
+    order_item = OrderItem.objects.filter(
         user=user,
-        ordered_date=ordered_date,
-        ordered=True)
-    for key, value in session['metadata'].items():
-        order_item = OrderItem.objects.create(
-            user=user,
-            product_variation=ProductVariation.objects.get(id=key),
-            quantity=value,
-            ordered=True
-        )
-        order.products.add(order_item)
+        ordered=False)
+    order_item.update(ordered=True)
+    order = Order.objects.filter(
+        user=user,
+        ordered=False)
     Payment.objects.create(
         stripe_charge_id=session['id'],
         user=user,
-        order=order,
+        order=order[0],
         amount=amount / 100,
     )
+    order.update(
+        ordered_date=ordered_date,
+        ordered=True)
 
 
 class OrderCompleteView(generic.TemplateView):

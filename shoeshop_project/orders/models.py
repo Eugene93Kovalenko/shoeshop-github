@@ -17,11 +17,11 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} pcs | {self.product_variation.product.name} | {self.product_variation.size} size |" \
-               f" {self.user}"
+               f" {self.user} | Ordered: {self.ordered}"
 
     class Meta:
-        verbose_name = "Заказ"
-        verbose_name_plural = "Заказы"
+        verbose_name = "Позиция в корзине"
+        verbose_name_plural = "Позиции в корзине"
 
     def get_remove_from_cart_url(self):
         return reverse("orders:remove-from-cart", kwargs={"slug": self.product_variation.product.slug})
@@ -32,7 +32,8 @@ class Order(models.Model):
                              on_delete=models.CASCADE,
                              null=True,
                              blank=True)
-    products = models.ManyToManyField(OrderItem)
+    products = models.ManyToManyField(OrderItem, related_name='shipping_address')
+    # products = models.ForeignKey(OrderItem, on_delete=models.CASCADE, blank=True, null=True)
     delivery_price = models.DecimalField(default=50, max_digits=7, decimal_places=2)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField()
@@ -46,8 +47,8 @@ class Order(models.Model):
         return f"{self.user} | Ordered: {self.ordered}"
 
     class Meta:
-        verbose_name = "Корзина"
-        verbose_name_plural = "Корзины"
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
 
 
 class ShippingAddress(models.Model):

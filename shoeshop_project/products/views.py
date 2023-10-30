@@ -131,7 +131,8 @@ class ProductDetailView(generic.DetailView):
             "product_slug"]).aggregate(average=Avg('rate', default=0))
         if average_product_rating is not None:
             context = self._round_custom(float(average_product_rating['average']), 0.5)
-        return context
+            return context
+        return None
 
 
 class ProductFormView(SingleObjectMixin, generic.FormView):
@@ -143,7 +144,6 @@ class ProductFormView(SingleObjectMixin, generic.FormView):
         user = self.request.user
         if user.is_anonymous:
             return redirect('accounts:login')
-        # self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
             return self.form_valid(form)

@@ -1,5 +1,6 @@
 # from datetime import datetime
 # from time import timezone
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, SearchHeadline
 from django.utils import timezone
 
 from django.contrib.auth.decorators import login_required
@@ -10,6 +11,7 @@ from django.views import generic
 from django.core.mail import send_mail
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormMixin
+from products.templatetags.custom_tags import *
 
 from .forms import ContactForm, ReviewForm
 from .models import *
@@ -57,10 +59,13 @@ class ShopView(generic.ListView):
             for material in self.request.GET.getlist('material'):
                 material_q |= Q(material__name=material)
 
+        # if self.request.GET.get('q'):
+        #     search_q |= Q(material__name=material)
+
         return brand_q & size_q & category_q & color_q & material_q
 
     def get_ordering(self):
-        return self.request.GET.get('ordering')
+        return self.request.GET.get('ordering', '')
 
     def get_queryset(self):
         gender_filters = {
@@ -87,7 +92,32 @@ class ShopView(generic.ListView):
         context['selected_category'] = [brand for brand in self.request.GET.getlist('category')]
         context['selected_color'] = [brand for brand in self.request.GET.getlist('color')]
         context['selected_material'] = [brand for brand in self.request.GET.getlist('material')]
+        context['selected_search'] = self.request.GET.get('q')
         context['ordering_options'] = Product.ORDERING_OPTIONS
+        context['request'] = self.request
+        context['parameters'] = self.request.GET.urlencode()
+        context['previous_url'] = self.request.META.get('HTTP_REFERER')
+        context['current_parameters'] = self.request.GET.urlencode()
+        return context
+
+
+class SearchView(ShopView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = self.request.GET.get("q")
+        search_vector = SearchVector("name", "description")
+        search_query = SearchQuery(query)
+        search_result = (
+            queryset.annotate(
+                search=search_vector, rank=SearchRank(search_vector, search_query)
+            )
+            .filter(search=search_query)
+        )
+        return search_result
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q')
         return context
 
 
@@ -207,7 +237,6 @@ class ProductReview(generic.ListView):
     context_object_name = "reviews"
 
     def get_queryset(self):
-        print(Review.objects.filter(product__slug='women_boots'))
         return Review.objects.filter(product__slug='women_boots')
 
     def get_context_data(self, *, object_list=None, **kwargs):

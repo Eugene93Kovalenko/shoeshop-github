@@ -21,7 +21,7 @@ from orders.models import *
 from products.forms import CouponForm
 
 
-class CartListView(generic.ListView):
+class CartView(generic.ListView):
     template_name = "orders/cart.html"
     context_object_name = 'cart_items'
 
@@ -35,46 +35,39 @@ class CartListView(generic.ListView):
         if self.request.session['recently_viewed']:
             context['recently_viewed'] = Product.objects.filter(slug__in=self.request.session[
                 'recently_viewed']).order_by('-last_visit')[:4]
+        # context['massage'] = messages.warning(self.request, "Вы не добавили ни одного товара в корзину")
         return context
 
 
-class CartCouponFormView(SingleObjectMixin, generic.FormView):
-    template_name = "orders/cart.html"
-    form_class = CouponForm
-
-    # def get(self, request, *args, **kwargs):
-    #     cart = Cart(self.request)
-    #     if not cart.get_final_order_price():
-    #         messages.warning(self.request, "Вы не добавили ни одного товара в корзину")
-    #         return super().get(request, *args, **kwargs)
-
-    def post(self, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        cart = Cart(self.request)
-        for item in cart:
-            item['price'] = int(item['price']) * 0.9
-        print(list(cart))
-        print('+++++++++++')
-        return super(CartCouponFormView, self).form_valid(form)
-
-    def get_success_url(self):
-        return reverse('orders:cart')
+# class CartCouponFormView(SingleObjectMixin, generic.FormView):
+#     template_name = "orders/cart.html"
+#     form_class = CouponForm
+#
+#     def post(self, *args, **kwargs):
+#         form = self.get_form()
+#         if form.is_valid():
+#             return self.form_valid(form)
+#         else:
+#             return self.form_invalid(form)
+#
+#     def form_valid(self, form):
+#         cart = Cart(self.request)
+#         for item in cart:
+#             item['price'] = int(item['price']) * 0.9
+#         return super(CartCouponFormView, self).form_valid(form)
+#
+#     def get_success_url(self):
+#         return reverse('orders:cart')
 
 
-class CartView(generic.View):
-    def get(self, request, *args, **kwargs):
-        view = CartListView.as_view()
-        return view(request, *args, **kwargs)
+# class CartView(generic.View):
+#     def get(self, request, *args, **kwargs):
+#         view = CartListView.as_view()
+#         return view(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        view = CartCouponFormView.as_view()
-        return view(request, *args, **kwargs)
+    # def post(self, request, *args, **kwargs):
+    #     view = CartCouponFormView.as_view()
+    #     return view(request, *args, **kwargs)
 
 
 @require_POST

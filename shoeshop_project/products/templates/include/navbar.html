@@ -1,4 +1,5 @@
 {% load static %}
+
 <nav class="colorlib-nav" role="navigation">
     <div class="top-menu">
         <div class="container">
@@ -7,11 +8,12 @@
                     <div id="colorlib-logo"><a href="{% url 'products:home' %}">Footwear</a></div>
                 </div>
                 <div class="col-sm-5 col-md-3">
-                    <form action="#" class="search-wrap">
+                    <form action="{% url 'products:search' %}" method="get" class="search-wrap">
                         <div class="form-group">
-                            <input type="search" class="form-control search" placeholder="Search">
-                            <button class="btn btn-primary submit-search text-center" type="submit"><i
-                                    class="icon-search"></i></button>
+                            <input type="search" name="q" class="form-control search" placeholder="Search"
+                                   {% if q %} value="{{ q }}" {% endif %}>
+                            <button class="btn btn-primary submit-search text-center" type="submit">
+                                <i class="icon-search"></i></button>
                         </div>
                     </form>
                 </div>

@@ -1,4 +1,5 @@
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.search import SearchVectorField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.urls import reverse
@@ -98,6 +99,7 @@ class Product(models.Model):
     num_visits = models.IntegerField(default=0)
     last_visit = models.DateTimeField(blank=True, null=True)
     category = models.ManyToManyField(Category, related_name="products", blank=True)
+    # search_vector = SearchVectorField(null=True)
 
     def __str__(self):
         return self.name

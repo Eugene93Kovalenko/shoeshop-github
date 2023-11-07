@@ -59,9 +59,6 @@ class ShopView(generic.ListView):
             for material in self.request.GET.getlist('material'):
                 material_q |= Q(material__name=material)
 
-        # if self.request.GET.get('q'):
-        #     search_q |= Q(material__name=material)
-
         return brand_q & size_q & category_q & color_q & material_q
 
     def get_ordering(self):
@@ -94,25 +91,28 @@ class ShopView(generic.ListView):
         context['selected_material'] = [brand for brand in self.request.GET.getlist('material')]
         context['selected_search'] = self.request.GET.get('q')
         context['ordering_options'] = Product.ORDERING_OPTIONS
-        context['request'] = self.request
-        context['parameters'] = self.request.GET.urlencode()
-        context['previous_url'] = self.request.META.get('HTTP_REFERER')
-        context['current_parameters'] = self.request.GET.urlencode()
         return context
 
 
 class SearchView(ShopView):
     def get_queryset(self):
-        queryset = super().get_queryset()
         query = self.request.GET.get("q")
         search_vector = SearchVector("name", "description")
         search_query = SearchQuery(query)
-        search_result = (
-            queryset.annotate(
-                search=search_vector, rank=SearchRank(search_vector, search_query)
+        if super().get_filters() or super().get_ordering():
+            search_result = (
+                super().get_queryset().annotate(
+                    search=search_vector, rank=SearchRank(search_vector, search_query)
+                )
+                .filter(search=search_query)
             )
-            .filter(search=search_query)
-        )
+        else:
+            search_result = (
+                Product.objects.annotate(
+                    search=search_vector, rank=SearchRank(search_vector, search_query)
+                )
+                .filter(search=search_query)
+            )
         return search_result
 
     def get_context_data(self, *, object_list=None, **kwargs):

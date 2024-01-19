@@ -31,8 +31,8 @@ class CartView(generic.ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
-        context['form'] = CouponForm()
-        if self.request.session['recently_viewed']:
+        # context['form'] = CouponForm()
+        if self.request.session.get('recently_viewed'):
             context['recently_viewed'] = Product.objects.filter(slug__in=self.request.session[
                 'recently_viewed']).order_by('-last_visit')[:4]
         # context['massage'] = messages.warning(self.request, "Вы не добавили ни одного товара в корзину")

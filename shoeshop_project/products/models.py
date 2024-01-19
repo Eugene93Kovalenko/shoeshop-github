@@ -66,15 +66,15 @@ class Size(models.Model):
         verbose_name_plural = "Размеры"
 
 
-class Material(models.Model):
-    name = models.CharField(max_length=40)
-
-    def __str__(self):
-        return str(self.name)
-
-    class Meta:
-        verbose_name = "Материал"
-        verbose_name_plural = "Материалы"
+# class Material(models.Model):
+#     name = models.CharField(max_length=40)
+#
+#     def __str__(self):
+#         return str(self.name)
+#
+#     class Meta:
+#         verbose_name = "Материал"
+#         verbose_name_plural = "Материалы"
 
 
 class Product(models.Model):
@@ -88,7 +88,7 @@ class Product(models.Model):
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     discount_price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    material = models.ForeignKey(Material, on_delete=models.CASCADE, blank=True)
+    # material = models.ForeignKey(Material, on_delete=models.CASCADE, blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
@@ -97,7 +97,7 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     num_visits = models.IntegerField(default=0)
-    last_visit = models.DateTimeField(blank=True, null=True)
+    last_visit = models.DateTimeField(auto_now=True, blank=True, null=True)
     category = models.ManyToManyField(Category, related_name="products", blank=True)
     # search_vector = SearchVectorField(null=True)
 

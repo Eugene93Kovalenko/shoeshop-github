@@ -43,8 +43,8 @@ class ShopView(generic.ListView):
             for brand in self.request.GET.getlist('brand'):
                 brand_q |= Q(brand__name=brand)
 
-        if self.request.GET.getlist('sizes'):
-            for size in self.request.GET.getlist('sizes'):
+        if self.request.GET.getlist('size'):
+            for size in self.request.GET.getlist('size'):
                 size_q |= Q(product_variation__size__name=size)
 
         if self.request.GET.getlist('category'):
@@ -55,11 +55,7 @@ class ShopView(generic.ListView):
             for color in self.request.GET.getlist('color'):
                 color_q |= Q(color__name=color)
 
-        if self.request.GET.getlist('material'):
-            for material in self.request.GET.getlist('material'):
-                material_q |= Q(material__name=material)
-
-        return brand_q & size_q & category_q & color_q & material_q
+        return brand_q & size_q & category_q & color_q
 
     def get_ordering(self):
         return self.request.GET.get('ordering', '')
@@ -81,14 +77,13 @@ class ShopView(generic.ListView):
         context['sizes_list'] = Size.objects.all()
         context['categories_list'] = Category.objects.all()
         context['colors_list'] = Color.objects.all()
-        context['materials_list'] = Material.objects.all()
         context['genders_list'] = Gender.objects.all().exclude(name='Unisex').order_by('name')
         context['selected_ordering'] = self.request.GET.get('ordering')
         context['selected_brand'] = [brand for brand in self.request.GET.getlist('brand')]
         context['selected_size'] = [int(size) for size in self.request.GET.getlist('size')]
+        print(context['selected_size'])
         context['selected_category'] = [brand for brand in self.request.GET.getlist('category')]
         context['selected_color'] = [brand for brand in self.request.GET.getlist('color')]
-        context['selected_material'] = [brand for brand in self.request.GET.getlist('material')]
         context['selected_search'] = self.request.GET.get('q')
         context['ordering_options'] = Product.ORDERING_OPTIONS
         return context

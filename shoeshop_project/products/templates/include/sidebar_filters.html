@@ -44,7 +44,7 @@
                             {% for size in sizes_list %}
                             <label class="checkbox-btn">
                                 <input type="checkbox" {% if size.name in selected_size %} checked {% endif %}
-                                       name="sizes" value="{{ size }}">
+                                       name="size" value="{{ size }}">
                                 <span>{{ size.name }}</span>
                             </label>
                             {% endfor %}
@@ -53,6 +53,24 @@
                 </div>
             </div>
             <!--END SIZE-->
+
+            <!--COLOR-->
+            <div class="col-sm-12">
+                <div class="side border mb-1">
+                    <h3>Color</h3>
+                    {% for color in colors_list %}
+                    <div class="form-check">
+                        <input class="form-check-input" {% if color.name in selected_color %} checked {% endif %}
+                               type="checkbox" value="{{ color }}"
+                               id="color-{{ forloop.counter0 }}" name="color">
+                        <label class="form-check-label" for="color-{{ forloop.counter0 }}">
+                            {{ color }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!--END COLOR-->
 
             <!--CATEGORY-->
             <div class="col-sm-12">
@@ -73,44 +91,6 @@
                 </div>
             </div>
             <!--END CATEGORY-->
-
-            <!--COLOR-->
-            <div class="col-sm-12">
-                <div class="side border mb-1">
-                    <h3>Color</h3>
-                    <!--                    <ul>-->
-                    {% for color in colors_list %}
-                    <div class="form-check">
-                        <input class="form-check-input" {% if color.name in selected_color %} checked {% endif %}
-                               type="checkbox" value="{{ color }}"
-                               id="color-{{ forloop.counter0 }}" name="color">
-                        <label class="form-check-label" for="color-{{ forloop.counter0 }}">
-                            {{ color }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                    <!--                    </ul>-->
-                </div>
-            </div>
-            <!--END COLOR-->
-
-            <!--MATERIAL-->
-            <div class="col-sm-12">
-                <div class="side border mb-1">
-                    <h3>Material</h3>
-                    {% for material in materials_list %}
-                    <div class="form-check">
-                        <input class="form-check-input" {% if material.name in selected_material %} checked {% endif %}
-                               type="checkbox" value="{{ material }}"
-                               id="material-{{ forloop.counter0 }}" name="material">
-                        <label class="form-check-label" for="material-{{ forloop.counter0 }}">
-                            {{ material }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <!--END MATERIAL-->
 
             {% if q %}
             <input type="hidden" name="q" value="{{ q }}">

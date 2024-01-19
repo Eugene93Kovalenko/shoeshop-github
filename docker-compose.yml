@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  #любое имя сервиса
+  postgres_new:
+    image: postgres:latest
+    container_name: postgres_cont
+    environment:
+      POSTGRES_USER: eugene
+      POSTGRES_PASSWORD: 1111
+      POSTGRES_DB: postgres_1
+    ports:
+      - '5433:5432'
+

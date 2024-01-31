@@ -4,10 +4,10 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres
-    environment:
-      POSTGRES_USER: eugene
-      POSTGRES_PASSWORD: 1111
-      POSTGRES_DB: postgres
+#    environment:
+#      POSTGRES_USER: eugene
+#      POSTGRES_PASSWORD: 1111
+#      POSTGRES_DB: postgres
     volumes:
       - postgres:/var/lib/postgresql/data/
     ports:
@@ -15,36 +15,18 @@ services:
 
   django:
       build: .
-#        context: ./shoeshop_project
       container_name: shoe_shop
       command: python manage.py runserver 0.0.0.0:8000
-#      volumes:
-        # понять
+      volumes:
+        - ./shoeshop_project:/app
       ports:
         - '8000:8000'
       depends_on:
         - postgres
-      environment:
-#        DATABASE_URL: postgres://postgres:secret@postgres_db:5432/postgres
+#      environment:
 #        DEBUG: False
-        DB_NAME: postgres
-        DB_USER: eugene
-        DB_PASSWORD: 1111
-#        DB_HOST: postgres_db
-#        DB_PORT: 5432
+#        DB_NAME: postgres
+#        DB_USER: eugene
+#        DB_PASSWORD: 1111
 volumes:
   postgres:
-
-#version: '3.8'
-#
-#services:
-#  #любое имя сервиса
-#  postgres_new:
-#    image: postgres:latest
-#    container_name: postgres_cont
-#    environment:
-#      POSTGRES_USER: eugene
-#      POSTGRES_PASSWORD: 1111
-#      POSTGRES_DB: postgres_1
-#    ports:
-#      - '5433:5432'

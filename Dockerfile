@@ -2,6 +2,7 @@ FROM python:3.11.4-slim-buster
 MAINTAINER Eugene Kovalenko, keugenemail@gmail.com
 
 ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 

@@ -8,9 +8,9 @@ services:
       - postgres:/var/lib/postgresql/data/
     ports:
       - '5432:5432'
-  django:
+  app:
     build: .
-    container_name: shoe_shop
+    container_name: app
     command: python manage.py runserver 0.0.0.0:8000
 #    command: gunicorn shoeshop_project.wsgi:application --blind 0.0.0.0:8000
     volumes:
@@ -33,14 +33,28 @@ services:
 
   celery:
     build: .
+    container_name: celery
     command: celery -A config worker -l INFO
     volumes:
       - ./shoeshop_project:/app
     depends_on:
-      - django
+      - app
       - redis
+
+  flower:
+    build: .
+    container_name: flower
+    command: celery -A config flower
+    volumes:
+      - ./shoeshop_project:/app
+    depends_on:
+      - redis
+    ports:
+      - '5555:5555'
+
   redis:
     image: redis
+    container_name: redis
     ports:
       - "6379:6379"
 volumes:

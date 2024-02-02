@@ -200,8 +200,8 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_BACKEND', 'redis://redis:6379/0')
 #SMTP
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_HOST_USER = 'udjin93@yandex.ru'
-EMAIL_HOST_PASSWORD = 'fuxcpulwgjxltxvm'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 465
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

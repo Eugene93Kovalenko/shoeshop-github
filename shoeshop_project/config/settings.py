@@ -33,7 +33,7 @@ STRIPE_SECRET_KEY = \
 
 STRIPE_WEBHOOK_SECRET = 'whsec_6b93d183453a6827a2fe99fa67b951d1a33aef6183395e67062d15849155e590'
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-hk@_ob#xryi7xtj57$(lsfb%mx+2q84l4v@g+9fe8nk1nasd+g'
@@ -193,7 +193,17 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+#CELERY
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER', 'redis://redis:6379/0')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_BACKEND', 'redis://redis:6379/0')
-broker_connection_retry_on_startup=True
 
+#SMTP
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST_USER = 'udjin93@yandex.ru'
+EMAIL_HOST_PASSWORD = 'fuxcpulwgjxltxvm'
+EMAIL_PORT = 465
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER

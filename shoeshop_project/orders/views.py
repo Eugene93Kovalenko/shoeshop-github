@@ -18,6 +18,7 @@ from accounts.models import CustomUser
 from orders.cart import Cart
 from orders.forms import CheckoutForm
 from orders.models import *
+from orders.tasks import send_order_conformation_mail
 from products.forms import CouponForm
 
 
@@ -255,7 +256,12 @@ class StripeWebhookView(generic.View):
 
 
 def _handle_successful_payment(session):
+    # print(session)
     user_id = session['client_reference_id']
+    user_email = session['customer_details']['email']
+    print(user_email)
+    user_name = session['customer_details']['name']
+    print(user_name)
     user = CustomUser.objects.get(id=user_id)
     amount = session['amount_total']
     ordered_date = timezone.now()
@@ -275,6 +281,8 @@ def _handle_successful_payment(session):
     order.update(
         ordered_date=ordered_date,
         ordered=True)
+
+    send_order_conformation_mail.delay(user_name, user_email)
 
 
 class OrderCompleteView(generic.TemplateView):

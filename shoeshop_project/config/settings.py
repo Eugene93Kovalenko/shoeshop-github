@@ -25,18 +25,16 @@ BACKEND_DOMAIN = "http://127.0.0.1:8000"
 PAYMENT_SUCCESS_URL = 'http://127.0.0.1:8000/success/'
 PAYMENT_CANCEL_URL = 'http://127.0.0.1:8000/cancel/'
 
-STRIPE_PUBLIC_KEY = \
-    'pk_test_51NtBRsEHgFzglP9yWCayky7DXIohqd82LZaU7kH9P8VtBYhftLhSr7Se2WDVPcdiXtd8oEWcqy0K0hHaTM52oeqD009R6bWUBK'
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 
-STRIPE_SECRET_KEY = \
-    'sk_test_51NtBRsEHgFzglP9yIL1zTu15lN9oVvsOdcVVRLhGX6ASt0Dg4lsTCCq3LAWcDPHYMXflH68kXPpvQkyUrM5Cogvj0002CBOu7Z'
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 
-STRIPE_WEBHOOK_SECRET = 'whsec_6b93d183453a6827a2fe99fa67b951d1a33aef6183395e67062d15849155e590'
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-hk@_ob#xryi7xtj57$(lsfb%mx+2q84l4v@g+9fe8nk1nasd+g'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -99,28 +97,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'shoeshop_db',
-#         'USER': 'postgres',
-#         'PASSWORD': 'udjin',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres_1',
-#         'USER': 'eugene',
-#         'PASSWORD': '1111',
-#         'HOST': 'localhost',
-#         'PORT': '5433',
-#     }
-# }
 
 DATABASES = {
     'default': {

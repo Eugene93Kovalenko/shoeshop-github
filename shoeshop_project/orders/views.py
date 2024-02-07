@@ -3,9 +3,8 @@ from decimal import Decimal
 import stripe
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import send_mail
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import generic
@@ -19,7 +18,6 @@ from orders.cart import Cart
 from orders.forms import CheckoutForm
 from orders.models import *
 from orders.tasks import send_order_conformation_mail
-from products.forms import CouponForm
 
 
 class CartView(generic.ListView):
@@ -32,33 +30,11 @@ class CartView(generic.ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user'] = self.request.user
-        # context['form'] = CouponForm()
         if self.request.session.get('recently_viewed'):
             context['recently_viewed'] = Product.objects.filter(slug__in=self.request.session[
                 'recently_viewed']).order_by('-last_visit')[:4]
         # context['massage'] = messages.warning(self.request, "Вы не добавили ни одного товара в корзину")
         return context
-
-
-# class CartCouponFormView(SingleObjectMixin, generic.FormView):
-#     template_name = "orders/cart.html"
-#     form_class = CouponForm
-#
-#     def post(self, *args, **kwargs):
-#         form = self.get_form()
-#         if form.is_valid():
-#             return self.form_valid(form)
-#         else:
-#             return self.form_invalid(form)
-#
-#     def form_valid(self, form):
-#         cart = Cart(self.request)
-#         for item in cart:
-#             item['price'] = int(item['price']) * 0.9
-#         return super(CartCouponFormView, self).form_valid(form)
-#
-#     def get_success_url(self):
-#         return reverse('orders:cart')
 
 
 # class CartView(generic.View):
@@ -256,12 +232,9 @@ class StripeWebhookView(generic.View):
 
 
 def _handle_successful_payment(session):
-    # print(session)
     user_id = session['client_reference_id']
     user_email = session['customer_details']['email']
-    print(user_email)
     user_name = session['customer_details']['name']
-    print(user_name)
     user = CustomUser.objects.get(id=user_id)
     amount = session['amount_total']
     ordered_date = timezone.now()

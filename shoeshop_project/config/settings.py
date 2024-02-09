@@ -20,10 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 CART_SESSION_ID = 'cart'
 
-BACKEND_DOMAIN = "http://127.0.0.1:8000"
+# убрал 8000
+BACKEND_DOMAIN = "http://localhost"
 
-PAYMENT_SUCCESS_URL = 'http://127.0.0.1:8000/success/'
-PAYMENT_CANCEL_URL = 'http://127.0.0.1:8000/cancel/'
+PAYMENT_SUCCESS_URL = 'http://localhost/success/'
+PAYMENT_CANCEL_URL = 'http://localhost/cancel/'
 
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 
@@ -31,11 +32,18 @@ STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', True)
+
+
+def custom_show_toolbar(request):
+    return True
+
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+}
 
 ALLOWED_HOSTS = ['*']
 
@@ -67,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
@@ -74,14 +83,6 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-
-def show_toolbar(request):
-    return True
-
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
-}
 
 ROOT_URLCONF = 'config.urls'
 
@@ -120,15 +121,15 @@ DATABASES = {
     }
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://redis:6379",
-        'OPTIONS': {
-            'db': '1',
-        }
-    }
-}
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "LOCATION": "redis://redis:6379",
+#         'OPTIONS': {
+#             'db': '1',
+#         }
+#     }
+# }
 
 
 # Password validation
@@ -178,6 +179,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = '/app/static/'
 
 STATICFILES_DIRS = []
 
@@ -197,10 +199,27 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_BACKEND', 'redis://redis:6379/0')
 # SMTP
 EMAIL_USE_SSL = True
 EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 465
+
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "handlers": {
+#         "console": {
+#             "class": "logging.StreamHandler",
+#         },
+#     },
+#     "loggers": {
+#         'django.db.backends': {
+#             "handlers": ["console"],
+#             "level": "DEBUG",
+#         }
+#     }
+# }

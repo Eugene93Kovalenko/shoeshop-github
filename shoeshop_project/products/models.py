@@ -17,8 +17,8 @@ class Category(models.Model):
         return reverse("product_app:category", kwargs={"category_name": self.name.lower()})
 
     class Meta:
-        verbose_name = "Категория"
-        verbose_name_plural = "Категории"
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
 
 
 class Gender(models.Model):
@@ -29,8 +29,8 @@ class Gender(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = "Гендер"
-        verbose_name_plural = "Гендеры"
+        verbose_name = "Gender"
+        verbose_name_plural = "Genders"
 
 
 class Brand(models.Model):
@@ -40,8 +40,8 @@ class Brand(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = "Бренд"
-        verbose_name_plural = "Бренды"
+        verbose_name = "Brand"
+        verbose_name_plural = "Brands"
 
 
 class Color(models.Model):
@@ -51,8 +51,8 @@ class Color(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = "Цвет"
-        verbose_name_plural = "Цвета"
+        verbose_name = "Color"
+        verbose_name_plural = "Colors"
 
 
 class Size(models.Model):
@@ -62,19 +62,8 @@ class Size(models.Model):
         return str(self.name)
 
     class Meta:
-        verbose_name = "Размер"
-        verbose_name_plural = "Размеры"
-
-
-# class Material(models.Model):
-#     name = models.CharField(max_length=40)
-#
-#     def __str__(self):
-#         return str(self.name)
-#
-#     class Meta:
-#         verbose_name = "Материал"
-#         verbose_name_plural = "Материалы"
+        verbose_name = "Size"
+        verbose_name_plural = "Sizes"
 
 
 class Product(models.Model):
@@ -88,7 +77,6 @@ class Product(models.Model):
     name = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     discount_price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    # material = models.ForeignKey(Material, on_delete=models.CASCADE, blank=True)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
@@ -99,7 +87,6 @@ class Product(models.Model):
     num_visits = models.IntegerField(default=0)
     last_visit = models.DateTimeField(auto_now=True, blank=True, null=True)
     category = models.ManyToManyField(Category, related_name="products", blank=True)
-    # search_vector = SearchVectorField(null=True)
 
     def __str__(self):
         return self.name
@@ -120,8 +107,8 @@ class Product(models.Model):
         return reverse("products:gender", kwargs={"gender_slug": self.gender.name})
 
     class Meta:
-        verbose_name = "Товар"
-        verbose_name_plural = "Товары"
+        verbose_name = "Product"
+        verbose_name_plural = "products"
         ordering = ["name"]
 
 
@@ -132,8 +119,8 @@ class ProductVariation(models.Model):
 
     class Meta:
         unique_together = ('product', 'size')
-        verbose_name = "Товар | Размер"
-        verbose_name_plural = "Товар | Размер"
+        verbose_name = "Product | Size"
+        verbose_name_plural = "Product | Size"
 
     def __str__(self):
         return f"{self.product} / {self.size} size"
@@ -146,8 +133,8 @@ class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
 
     class Meta:
-        verbose_name = "Фото"
-        verbose_name_plural = "Фото"
+        verbose_name = "Photo"
+        verbose_name_plural = "Photos"
 
     def __str__(self):
         return self.image.name
@@ -174,8 +161,8 @@ class Review(models.Model):
     created_at = models.DateField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Отзыв'
-        verbose_name_plural = 'Отзывы'
+        verbose_name = 'Review'
+        verbose_name_plural = 'Reviews'
 
     def __str__(self):
         return f'{str(self.user)} | {self.product} | {self.rate}'

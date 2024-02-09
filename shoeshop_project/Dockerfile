@@ -8,9 +8,9 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 WORKDIR /app
 
 RUN pip install --upgrade pip
-COPY requirements.txt /app/requirements.txt
+COPY ./requirements.txt ./
 RUN pip install -r requirements.txt
 
-COPY shoeshop_project /app
+COPY . .
 
 EXPOSE 8000

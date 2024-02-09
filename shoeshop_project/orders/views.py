@@ -83,12 +83,12 @@ class CheckoutFormView(generic.FormView):
         user = self.request.user
         cart = Cart(self.request)
         ordered_date = timezone.now()
-        old_order = Order.objects.filter(user=user, ordered=False)
-        if old_order:
+        existing_order = Order.objects.filter(user=user, ordered=False)
+        if existing_order:
             Order.objects.get(user=user, ordered=False).delete()
 
-            old_order_items = OrderItem.objects.filter(user=user, ordered=False)
-            for item in old_order_items:
+            existing_order_items = OrderItem.objects.filter(user=user, ordered=False)
+            for item in existing_order_items:
                 item.delete()
 
         order = Order.objects.create(
@@ -124,30 +124,6 @@ class CheckoutFormView(generic.FormView):
         return super(CheckoutFormView, self).form_valid(form)
 
 
-# def get_coupon(request, code):
-#     try:
-#         coupon = Coupon.objects.get(code=code)
-#         return coupon
-#     except ObjectDoesNotExist:
-#         messages.info(request, "This coupon does not exist")
-#         return redirect("orders:cart")
-
-
-# class AddCouponView(generic.View):
-#     def post(self, *args, **kwargs):
-#         form = CouponForm(self.request.POST or None)
-#         if form.is_valid():
-#             try:
-#                 code = form.cleaned_data.get('code')
-#                 order = Order.objects.get(
-#                     user=self.request.user, ordered=False)
-#                 order.coupon = get_coupon(self.request, code)
-#                 order.save()
-#                 return redirect("orders:cart")
-#             except ObjectDoesNotExist:
-#                 return redirect("orders:cart")
-
-
 class CreateStripeCheckoutSessionView(generic.View):
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -160,7 +136,7 @@ class CreateStripeCheckoutSessionView(generic.View):
             metadata=self.get_metadata(),
             success_url=settings.PAYMENT_SUCCESS_URL,
             cancel_url=settings.PAYMENT_CANCEL_URL,
-            customer_email=self.get_user_email()
+            # customer_email=self.get_user_email()
         )
         return redirect(checkout_session.url)
 
@@ -202,7 +178,7 @@ class CreateStripeCheckoutSessionView(generic.View):
         return line_items_list
 
     def get_user_email(self):
-        return self.request.user.email
+        return self.request.user.shipping_email
 
 
 @method_decorator(csrf_exempt, name="dispatch")

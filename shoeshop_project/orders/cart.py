@@ -22,7 +22,6 @@ class Cart:
 
         for product_variation in product_variations:
             cart[str(product_variation.id)]['product_variation'] = product_variation
-            # print(cart[str(product_variation.id)])
 
         for item in cart.values():
             item['price'] = Decimal(item['price'])

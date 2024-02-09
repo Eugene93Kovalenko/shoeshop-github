@@ -147,9 +147,6 @@
 										   					<i class="icon-star{% if review.rate >= 4 %}-full{% endif %}"></i>
 										   					<i class="icon-star{% if review.rate == 5 %}-full{% endif %}"></i>
 									   					</span>
-                                                            <span class="text-right">
-                                                                <a href="#" class="reply"><i class="icon-reply"></i></a>
-                                                            </span>
                                                         </p>
                                                         <p>{{ review.text }}</p>
                                                     </div>
@@ -167,9 +164,9 @@
 										   					<i class="icon-star-full"></i>
 										   					<i class="icon-star-full"></i>
 										   					<i class="icon-star-full"></i>
-										   					(98%)
+										   					({{ five_star_persentage_count }}%)
 									   					</span>
-                                                            <span>20 Reviews</span>
+                                                            <span>{{ five_star_rates_count }} Review(s)</span>
                                                         </p>
                                                         <p class="star">
 										   				<span>
@@ -180,7 +177,7 @@
 										   					<i class="icon-star-empty"></i>
 										   					(85%)
 									   					</span>
-                                                            <span>10 Reviews</span>
+                                                            <span>{{ four_star_rates_count }} Review(s)</span>
                                                         </p>
                                                         <p class="star">
 										   				<span>
@@ -191,7 +188,7 @@
 										   					<i class="icon-star-empty"></i>
 										   					(70%)
 									   					</span>
-                                                            <span>5 Reviews</span>
+                                                            <span>{{ three_star_rates_count }} Review(s)</span>
                                                         </p>
                                                         <p class="star">
 										   				<span>
@@ -202,7 +199,7 @@
 										   					<i class="icon-star-empty"></i>
 										   					(10%)
 									   					</span>
-                                                            <span>0 Reviews</span>
+                                                            <span>{{ two_star_rates_count }} Review(s)</span>
                                                         </p>
                                                         <p class="star">
 										   				<span>
@@ -213,7 +210,7 @@
 										   					<i class="icon-star-empty"></i>
 										   					(0%)
 									   					</span>
-                                                            <span>0 Reviews</span>
+                                                            <span>{{ one_star_rates_count }} Review(s)</span>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -264,7 +261,6 @@
         </div>
     </div>
 </div>
-
 
 {% endblock content %}
 

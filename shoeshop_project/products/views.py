@@ -146,6 +146,17 @@ class ProductDetailView(generic.DetailView):
         context['product_reviews'] = Review.objects.filter(product__slug=self.kwargs["product_slug"])
         context['reviews_quantity'] = Review.objects.filter(product__slug=self.kwargs["product_slug"]).count()
         context['average_rating'] = self.get_average_rating()
+        context['five_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
+                                                                 rate=5).count()
+        context['four_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
+                                                                 rate=4).count()
+        context['three_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
+                                                                  rate=3).count()
+        context['two_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
+                                                                rate=2).count()
+        context['one_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
+                                                                rate=1).count()
+        context['five_star_persentage_count'] = context['five_star_rates_count'] / context['reviews_quantity'] * 100
         return context
 
     def _round_custom(self, num, step):

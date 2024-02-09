@@ -20,8 +20,8 @@ class OrderItem(models.Model):
                f" {self.user} | Ordered: {self.ordered}"
 
     class Meta:
-        verbose_name = "Позиция в корзине"
-        verbose_name_plural = "Позиции в корзине"
+        verbose_name = "Product in cart"
+        verbose_name_plural = "Products in cart"
 
     def get_remove_from_cart_url(self):
         return reverse("orders:remove-from-cart", kwargs={"slug": self.product_variation.product.slug})
@@ -40,15 +40,13 @@ class Order(models.Model):
     ordered = models.BooleanField(default=False)
     shipping_address = models.ForeignKey(
         'ShippingAddress', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
-    coupon = models.ForeignKey(
-        'Coupon', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return f"{self.user} | Ordered: {self.ordered}"
 
     class Meta:
-        verbose_name = "Заказ"
-        verbose_name_plural = "Заказы"
+        verbose_name = "Order"
+        verbose_name_plural = "Orders"
 
 
 class ShippingAddress(models.Model):
@@ -63,8 +61,8 @@ class ShippingAddress(models.Model):
     default = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = 'Адрес'
-        verbose_name_plural = 'Адреса'
+        verbose_name = 'Address'
+        verbose_name_plural = 'Addresses'
 
     def __str__(self):
         return f'{self.user} | {self.city} | {self.address}'
@@ -86,18 +84,5 @@ class Payment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Оплата'
-        verbose_name_plural = 'Оплаты'
-
-
-class Coupon(models.Model):
-    code = models.CharField(max_length=15)
-    amount = models.FloatField()
-    one_timer = models.BooleanField()
-
-    class Meta:
-        verbose_name = 'Купон'
-        verbose_name_plural = 'Купоны'
-
-    def __str__(self):
-        return self.code
+        verbose_name = 'Payment'
+        verbose_name_plural = 'Payments'

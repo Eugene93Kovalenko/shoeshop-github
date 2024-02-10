@@ -1,11 +1,13 @@
 # from datetime import datetime
 # from time import timezone
+import time
+
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, SearchHeadline
 from django.utils import timezone
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q, Avg
+from django.db.models import Q, Avg, Count, F, ExpressionWrapper, DecimalField
 from django.shortcuts import get_object_or_404, redirect
 from django.views import generic
 from django.core.mail import send_mail
@@ -141,30 +143,27 @@ class ProductDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context["form"] = ReviewForm()
         context["product_images"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
-        context['sizes_per_product_list'] = [product.size for product in ProductVariation.objects.filter(
+        context['list_of_product_sizes'] = [product.size for product in ProductVariation.objects.filter(
             product__slug=self.kwargs["product_slug"])]
         context['product_reviews'] = Review.objects.filter(product__slug=self.kwargs["product_slug"])
         context['reviews_quantity'] = Review.objects.filter(product__slug=self.kwargs["product_slug"]).count()
         context['average_rating'] = self.get_average_rating()
-        context['five_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
-                                                                 rate=5).count()
-        context['four_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
-                                                                 rate=4).count()
-        context['three_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
-                                                                  rate=3).count()
-        context['two_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
-                                                                rate=2).count()
-        context['one_star_rates_count'] = Review.objects.filter(product__slug=self.kwargs["product_slug"],
-                                                                rate=1).count()
-        context['five_star_persentage_count'] = context['five_star_rates_count'] / context['reviews_quantity'] * 100
+        ratings_count = Review.objects.filter(product__slug=self.kwargs["product_slug"]) \
+                                      .values('rate') \
+                                      .annotate(count=Count('rate')) \
+                                      .annotate(percent=ExpressionWrapper((F('count') * 100) / context['reviews_quantity'],
+                                                output_field=DecimalField()))
+        for rating_count in ratings_count:
+            context[f'count_of_{rating_count["rate"]}_star_reviews'] = rating_count['count']
+            context[f'percentage_of_{rating_count["rate"]}_star_reviews'] = rating_count['percent']
         return context
 
     def _round_custom(self, num, step):
         return round(num / step) * step
 
     def get_average_rating(self):
-        average_product_rating = Review.objects.filter(product__slug=self.kwargs[
-            "product_slug"]).aggregate(average=Avg('rate', default=0))
+        average_product_rating = Review.objects.filter(product__slug=self.kwargs["product_slug"])\
+                                               .aggregate(average=Avg('rate', default=0))
         if average_product_rating is not None:
             context = self._round_custom(float(average_product_rating['average']), 0.5)
             return context

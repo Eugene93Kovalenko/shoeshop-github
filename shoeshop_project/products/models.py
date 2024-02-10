@@ -151,9 +151,10 @@ class Review(models.Model):
         (4, '4'),
         (5, '5'),
     )
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
     rate = models.PositiveIntegerField(choices=RATING_CHOICES,
-                                       validators=[MinValueValidator(1), MaxValueValidator(5)])
+                                       validators=[MinValueValidator(1), MaxValueValidator(5)],
+                                       blank=False)
     text = models.TextField(max_length=3000, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30)

@@ -40,7 +40,7 @@
                             <i class="icon-star{% if average_rating == 2.5 %}-half{% elif average_rating > 2 %}-full{% endif %}"></i>
                             <i class="icon-star{% if average_rating == 3.5 %}-half{% elif average_rating > 3 %}-full{% endif %}"></i>
                             <i class="icon-star{% if average_rating == 4.5 %}-half{% elif average_rating > 4 %}-full{% endif %}"></i>
-                            ({{ reviews_quantity }} ratings)
+                            ({{ reviews_quantity }} review(s))
                         </span>
                         <p>{{ product.description}}</p>
                         <form action="{{ product.get_add_to_cart_url }}" method="post">
@@ -48,7 +48,7 @@
                             <div class="size-wrap">
                                 <div class="block-26 mb-2">
                                     <h4>Size</h4>
-                                    {% for size in sizes_per_product_list %}
+                                    {% for size in list_of_product_sizes %}
                                     <label class="checkbox-btn">
                                         <input type="radio" class="btn-check" name="product-size"
                                                value="{{ size.name }}">
@@ -122,16 +122,12 @@
                                          aria-labelledby="pills-review-tab">
                                         <div class="row">
                                             <div class="col-md-8">
-                                                {% if reviews_quantity == 1 %}
-                                                <h3 class="head">{{ reviews_quantity }} REVIEW</h3>
-                                                {% else %}
-                                                <h3 class="head">{{ reviews_quantity }} REVIEWS</h3>
-                                                {% endif %}
+                                                <h3 class="head">{{ reviews_quantity }} REVIEW(S)</h3>
                                                 {% for review in product_reviews %}
                                                 <div class="review">
-                                                    <!--                                                    <div class="user-img"-->
-                                                    <!--                                                         style="background-image: url(images/person1.jpg)">-->
-                                                    <!--                                                    </div>-->
+                                                    <!--<div class="user-img"-->
+                                                    <!--     style="background-image: url(images/person1.jpg)">-->
+                                                    <!--</div>-->
                                                     <div class="desc">
                                                         <h4>
                                                             <span class="text-left">
@@ -164,9 +160,10 @@
 										   					<i class="icon-star-full"></i>
 										   					<i class="icon-star-full"></i>
 										   					<i class="icon-star-full"></i>
-										   					({{ five_star_persentage_count }}%)
+                                                            ({% firstof percentage_of_5_star_reviews '0' %}%)
 									   					</span>
-                                                            <span>{{ five_star_rates_count }} Review(s)</span>
+                                                            <span>{% firstof count_of_5_star_reviews '0' %} review(s)
+                                                            </span>
                                                         </p>
                                                         <p class="star">
 										   				<span>
@@ -175,9 +172,10 @@
 										   					<i class="icon-star-full"></i>
 										   					<i class="icon-star-full"></i>
 										   					<i class="icon-star-empty"></i>
-										   					(85%)
+                                                            ({% firstof percentage_of_4_star_reviews '0' %}%)
 									   					</span>
-                                                            <span>{{ four_star_rates_count }} Review(s)</span>
+                                                            <span>{% firstof count_of_4_star_reviews '0' %} review(s)
+                                                            </span>
                                                         </p>
                                                         <p class="star">
 										   				<span>
@@ -186,9 +184,10 @@
 										   					<i class="icon-star-full"></i>
 										   					<i class="icon-star-empty"></i>
 										   					<i class="icon-star-empty"></i>
-										   					(70%)
+                                                            ({% firstof percentage_of_3_star_reviews '0' %}%)
 									   					</span>
-                                                            <span>{{ three_star_rates_count }} Review(s)</span>
+                                                            <span>{% firstof count_of_3_star_reviews '0' %} review(s)
+                                                            </span>
                                                         </p>
                                                         <p class="star">
 										   				<span>
@@ -197,9 +196,10 @@
 										   					<i class="icon-star-empty"></i>
 										   					<i class="icon-star-empty"></i>
 										   					<i class="icon-star-empty"></i>
-										   					(10%)
+                                                            ({% firstof percentage_of_2_star_reviews '0' %}%)
 									   					</span>
-                                                            <span>{{ two_star_rates_count }} Review(s)</span>
+                                                            <span>{% firstof count_of_2_star_reviews '0' %} review(s)
+                                                            </span>
                                                         </p>
                                                         <p class="star">
 										   				<span>
@@ -208,9 +208,10 @@
 										   					<i class="icon-star-empty"></i>
 										   					<i class="icon-star-empty"></i>
 										   					<i class="icon-star-empty"></i>
-										   					(0%)
+                                                            ({% firstof percentage_of_1_star_reviews '0' %}%)
 									   					</span>
-                                                            <span>{{ one_star_rates_count }} Review(s)</span>
+                                                            <span>{% firstof count_of_1_star_reviews '0' %} review(s)
+                                                            </span>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -231,7 +232,17 @@
                                                 {% csrf_token %}
                                                 <div class="d-flex my-3">
                                                     <p class="mb-0 mr-2">Your Rating * :</p>
-                                                    {{ form.rate }}
+<!--                                                    {{ form.rate }}-->
+                                                    <div class="rating-area">
+                                                        {% for rate in form.rate %}
+                                                            <input type="radio" id="{{ forloop.revcounter }}" name="rate"
+                                                                   value="{{ forloop.revcounter }}">
+	                                                        <label for="{{ forloop.revcounter }}" title=""></label>
+<!--                                                            <input type="radio" id="{{ rate }}" name="rate"-->
+<!--                                                                   value="{{ rate }}">-->
+<!--	                                                        <label for="{{ rate }}" title=""></label>-->
+                                                        {% endfor %}
+                                                    </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Your First Name * :</label>
@@ -263,4 +274,76 @@
 </div>
 
 {% endblock content %}
+
+<!--<style>-->
+<!--    .rating-area {-->
+<!--	overflow: hidden;-->
+<!--	width: 265px;-->
+<!--	margin: 0 auto;-->
+<!--}-->
+<!--.rating-area:not(:checked) > input {-->
+<!--	display: none;-->
+<!--}-->
+<!--.rating-area:not(:checked) > label {-->
+<!--	float: right;-->
+<!--	width: 42px;-->
+<!--	padding: 0;-->
+<!--	cursor: pointer;-->
+<!--	font-size: 32px;-->
+<!--	line-height: 32px;-->
+<!--	color: lightgrey;-->
+<!--	text-shadow: 1px 1px #bbb;-->
+<!--}-->
+<!--.rating-area:not(:checked) > label:before {-->
+<!--	content: '★';-->
+<!--}-->
+<!--.rating-area > input:checked ~ label {-->
+<!--	color: grey;-->
+<!--	text-shadow: 1px 1px #c60;-->
+<!--}-->
+<!--.rating-area:not(:checked) > label:hover,-->
+<!--.rating-area:not(:checked) > label:hover ~ label {-->
+<!--	color: grey;-->
+<!--}-->
+<!--.rating-area > input:checked + label:hover,-->
+<!--.rating-area > input:checked + label:hover ~ label,-->
+<!--.rating-area > input:checked ~ label:hover,-->
+<!--.rating-area > input:checked ~ label:hover ~ label,-->
+<!--.rating-area > label:hover ~ input:checked ~ label {-->
+<!--	color: grey;-->
+<!--	text-shadow: 1px 1px goldenrod;-->
+<!--}-->
+<!--.rate-area > label:active {-->
+<!--	position: relative;-->
+<!--}-->
+
+<!--/* Скрыть стандартный radio элемент */-->
+<!--input[type="radio"] {-->
+<!--  display: none;-->
+<!--}-->
+
+<!--/* Стилизация кастомной кнопки */-->
+<!--.checkbox-btn {-->
+<!--  display: inline-block;-->
+<!--  cursor: pointer;-->
+<!--}-->
+
+<!--.btn-check {-->
+<!--  display: none; /* Скрыть стандартный radio элемент */-->
+<!--}-->
+
+<!--/* Стилизация внешнего вида кастомной кнопки */-->
+<!--.btn-check + span {-->
+<!--  display: inline-block;-->
+<!--  border: 1px solid #ccc;-->
+<!--  padding: 8px 12px;-->
+<!--  border-radius: 4px;-->
+<!--}-->
+
+<!--/* Стилизация кастомной кнопки при выборе */-->
+<!--.btn-check:checked + span {-->
+<!--  background-color: #007bff;-->
+<!--  color: #fff;-->
+<!--}-->
+<!--</style>-->
 

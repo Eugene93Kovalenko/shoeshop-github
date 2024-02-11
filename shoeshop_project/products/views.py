@@ -17,6 +17,7 @@ from products.templatetags.custom_tags import *
 
 from .forms import ContactForm, ReviewForm
 from .models import *
+from . import tasks
 
 
 class HomeView(generic.ListView):
@@ -145,14 +146,15 @@ class ProductDetailView(generic.DetailView):
         context["product_images"] = ProductImage.objects.filter(product__slug=self.kwargs["product_slug"])
         context['list_of_product_sizes'] = [product.size for product in ProductVariation.objects.filter(
             product__slug=self.kwargs["product_slug"])]
-        context['product_reviews'] = Review.objects.filter(product__slug=self.kwargs["product_slug"])
+        context['product_reviews'] = Review.objects.filter(product__slug=self.kwargs["product_slug"]) \
+            .order_by('-created_at')
         context['reviews_quantity'] = Review.objects.filter(product__slug=self.kwargs["product_slug"]).count()
         context['average_rating'] = self.get_average_rating()
         ratings_count = Review.objects.filter(product__slug=self.kwargs["product_slug"]) \
-                                      .values('rate') \
-                                      .annotate(count=Count('rate')) \
-                                      .annotate(percent=ExpressionWrapper((F('count') * 100) / context['reviews_quantity'],
-                                                output_field=DecimalField()))
+            .values('rate') \
+            .annotate(count=Count('rate')) \
+            .annotate(percent=ExpressionWrapper((F('count') * 100) / context['reviews_quantity'],
+                      output_field=DecimalField()))
         for rating_count in ratings_count:
             context[f'count_of_{rating_count["rate"]}_star_reviews'] = rating_count['count']
             context[f'percentage_of_{rating_count["rate"]}_star_reviews'] = rating_count['percent']
@@ -162,8 +164,8 @@ class ProductDetailView(generic.DetailView):
         return round(num / step) * step
 
     def get_average_rating(self):
-        average_product_rating = Review.objects.filter(product__slug=self.kwargs["product_slug"])\
-                                               .aggregate(average=Avg('rate', default=0))
+        average_product_rating = Review.objects.filter(product__slug=self.kwargs["product_slug"]) \
+            .aggregate(average=Avg('rate', default=0))
         if average_product_rating is not None:
             context = self._round_custom(float(average_product_rating['average']), 0.5)
             return context
@@ -220,15 +222,13 @@ class ContactView(generic.FormView):
         return reverse('products:home')
 
     def form_valid(self, form):
+        first_name = form.cleaned_data['first_name']
+        last_name = form.cleaned_data['last_name']
         sender = form.cleaned_data['email']
         subject = form.cleaned_data['subject']
         message = form.cleaned_data['message']
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=sender,
-            recipient_list=['udjin93@yandex.ru'],
-        )
+
+        tasks.send_email_from_contact_form.delay(first_name, last_name, sender, subject, message)
         return super(ContactView, self).form_valid(form)
 
 

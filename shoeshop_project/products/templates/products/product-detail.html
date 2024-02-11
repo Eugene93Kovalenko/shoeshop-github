@@ -79,9 +79,8 @@
                             <div class="row">
                                 <div class="row col-sm-12 text-center">
                                     <p class="addtocart">
-                                        <!--                                    <button type="submit" href="{{ product.get_size }}"-->
                                         <button class="btn btn-primary btn-addtocart update-cart">
-                                            <i class="icon-shopping-cart"></i>Add to Cart
+                                            <i class="icon-shopping-cart" ></i>Add to Cart
                                         </button>
                                     </p>
                                 </div>
@@ -231,16 +230,12 @@
                                             <form method="post">
                                                 {% csrf_token %}
                                                 <div class="d-flex my-3">
-                                                    <p class="mb-0 mr-2">Your Rating * :</p>
-<!--                                                    {{ form.rate }}-->
+                                                    <p class="mb-0 mr-2">Choose Your Rating * :</p>
                                                     <div class="rating-area">
                                                         {% for rate in form.rate %}
-                                                            <input type="radio" id="{{ forloop.revcounter }}" name="rate"
-                                                                   value="{{ forloop.revcounter }}">
+                                                            <input type="radio" id="{{ forloop.revcounter }}"
+                                                                   name="rate" value="{{ forloop.revcounter }}" checked>
 	                                                        <label for="{{ forloop.revcounter }}" title=""></label>
-<!--                                                            <input type="radio" id="{{ rate }}" name="rate"-->
-<!--                                                                   value="{{ rate }}">-->
-<!--	                                                        <label for="{{ rate }}" title=""></label>-->
                                                         {% endfor %}
                                                     </div>
                                                 </div>

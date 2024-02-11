@@ -17,7 +17,7 @@ from accounts.models import CustomUser
 from orders.cart import Cart
 from orders.forms import CheckoutForm
 from orders.models import *
-from orders.tasks import send_order_conformation_mail
+from . import tasks
 
 
 class CartView(generic.ListView):
@@ -231,7 +231,7 @@ def _handle_successful_payment(session):
         ordered_date=ordered_date,
         ordered=True)
 
-    send_order_conformation_mail.delay(user_name, user_email)
+    tasks.send_order_conformation_mail.delay(user_name, user_email)
 
 
 class OrderCompleteView(generic.TemplateView):

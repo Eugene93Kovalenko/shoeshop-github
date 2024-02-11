@@ -22,7 +22,8 @@ class ReviewForm(forms.Form):
         (4, 4),
         (5, 5)
     ]
-    rate = forms.CharField(widget=forms.RadioSelect(choices=RATING_CHOICES))
+    rate = forms.CharField(widget=forms.Select(choices=RATING_CHOICES))
+    # rate = forms.ChoiceField(widget=forms.RadioSelect(choices=RATING_CHOICES))
     text = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={'class': 'form-control'}))
     first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'class': 'form-control'}))
